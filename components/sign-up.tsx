@@ -192,18 +192,7 @@ export function SignUp() {
 						>
 							<GitHubLogoIcon />
 						</Button>
-						<Button
-							variant="outline"
-							className="w-full gap-2"
-							onClick={async () => {
-								await signIn.social({
-									provider: "discord",
-									callbackURL: "/dashboard",
-								});
-							}}
-						>
-							<DiscordLogoIcon />
-						</Button>
+
 						<Button
 							variant="outline"
 							className="w-full gap-2"
@@ -266,7 +255,7 @@ export function SignUp() {
 			<CardFooter>
 				<div className="flex justify-center w-full border-t py-4">
 					<p className="text-center text-xs text-neutral-500">
-						Secured by <span className="text-orange-400">better-auth.</span>
+						Secured by <span className="text-green-500">JEMS.</span>
 					</p>
 				</div>
 			</CardFooter>

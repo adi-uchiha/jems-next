@@ -105,7 +105,7 @@ export default function SignIn() {
 					>
 						{loading ? <Loader2 size={16} className="animate-spin" /> : "Login"}
 					</Button>
-					<div className="grid grid-cols-4 gap-2">
+					<div className="grid grid-cols-3 gap-2">
 						<Button
 							variant="outline"
 							className="gap-2"
@@ -118,17 +118,7 @@ export default function SignIn() {
 						>
 							<GitHubLogoIcon />
 						</Button>
-						<Button
-							variant="outline"
-							className="gap-2"
-							onClick={async () => {
-								await signIn.social({
-									provider: "discord",
-								});
-							}}
-						>
-							<DiscordLogoIcon />
-						</Button>
+
 						<Button
 							variant="outline"
 							className=" gap-2"
@@ -163,103 +153,18 @@ export default function SignIn() {
 								/>
 							</svg>
 						</Button>
-						<Button
-							variant="outline"
-							className="gap-2"
-							onClick={async () => {
-								const { data } = await signIn.social({
-									provider: "microsoft",
-									callbackURL: "/dashboard",
-								});
-							}}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1.2em"
-								height="1.2em"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M2 3h9v9H2zm9 19H2v-9h9zM21 3v9h-9V3zm0 19h-9v-9h9z"
-								></path>
-							</svg>
-						</Button>
-						<Button
-							variant="outline"
-							className="gap-2"
-							onClick={async () => {
-								await signIn.social({
-									provider: "twitch",
-									callbackURL: "/dashboard",
-								});
-							}}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1.2em"
-								height="1.2em"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43Z"
-								></path>
-							</svg>
-						</Button>
 
 						<Button
 							variant="outline"
 							className="gap-2"
 							onClick={async () => {
 								await signIn.social({
-									provider: "facebook",
+									provider: "linkedin",
 									callbackURL: "/dashboard",
 								});
 							}}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1.3em"
-								height="1.3em"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95"
-								></path>
-							</svg>
-						</Button>
-						<Button
-							variant="outline"
-							className="gap-2"
-							onClick={async () => {
-								await signIn.social({
-									provider: "twitter",
-									callbackURL: "/dashboard",
-								});
-							}}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="1em"
-								height="1em"
-								viewBox="0 0 14 14"
-							>
-								<g fill="none">
-									<g clipPath="url(#primeTwitter0)">
-										<path
-											fill="currentColor"
-											d="M11.025.656h2.147L8.482 6.03L14 13.344H9.68L6.294 8.909l-3.87 4.435H.275l5.016-5.75L0 .657h4.43L7.486 4.71zm-.755 11.4h1.19L3.78 1.877H2.504z"
-										></path>
-									</g>
-									<defs>
-										<clipPath id="primeTwitter0">
-											<path fill="#fff" d="M0 0h14v14H0z"></path>
-										</clipPath>
-									</defs>
-								</g>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 448 512" fill="currentColor"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z" fill="currentColor"></path></svg>
 						</Button>
 					</div>
 					<Button
@@ -286,7 +191,7 @@ export default function SignIn() {
 			<CardFooter>
 				<div className="flex justify-center w-full border-t py-4">
 					<p className="text-center text-xs text-neutral-500">
-						Secured by <span className="text-orange-400">better-auth.</span>
+						Secured by <span className="text-green-500">JEMS.</span>
 					</p>
 				</div>
 			</CardFooter>

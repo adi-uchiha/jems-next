@@ -371,14 +371,16 @@ export default function OnboardingPage() {
               <motion.div 
                 className="absolute left-4 top-8 w-0.5 bg-muted"
                 style={{ 
-                  height: `${(steps.length - 1) * 40}px` // Adjust based on your spacing
+                  // Calculate height to reach center of last circle
+                  height: `${((steps.length - 1) * 40) + 16}px` // 40px per step spacing + 16px to center
                 }}
               >
                 <motion.div
                   className="absolute top-0 w-full bg-primary origin-top"
                   initial={{ scaleY: 0 }}
                   animate={{ 
-                    scaleY: Math.min(completedSteps.length / (steps.length - 1), 1) 
+                    // Adjust scale to stop at last circle's center
+                    scaleY: Math.min(completedSteps.length / steps.length, 1)
                   }}
                   transition={{ duration: 0.5 }}
                   style={{ height: "100%" }}
@@ -400,7 +402,7 @@ export default function OnboardingPage() {
                           "relative flex items-center justify-center w-8 h-8 rounded-full border-2 bg-background",
                           status === "completed"
                             ? "border-primary bg-primary"
-                            : status === "current"
+                            : status === "current" && isSubmitting
                               ? "border-primary"
                               : "border-muted",
                         )}

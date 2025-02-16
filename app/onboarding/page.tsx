@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef } from "react"
 import { FileIcon, CheckIcon, TrashIcon, Check } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -31,8 +30,8 @@ const steps: Step[] = [
   },
   {
     id: 2,
-    title: "Parsing File",
-    subtitle: "Please wait while we parse your file",
+    title: "Parsing Resume",
+    subtitle: "Using AI to analyze your resume",
   },
   {
     id: 3,
@@ -52,6 +51,7 @@ const steps: Step[] = [
 ]
 
 export default function OnboardingPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [uploadState, setUploadState] = useState<UploadState>({
     status: "idle",
@@ -84,30 +84,9 @@ export default function OnboardingPage() {
     setLoading(false)
   }
 
-  const simulateUpload = (file: File) => {
-    setUploadState({
-      status: "uploading",
-      progress: 0,
-      fileName: file.name,
-      fileSize: formatFileSize(file.size),
-    })
-
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 20
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-        setUploadState((prev) => ({ ...prev, status: "success", progress: 100 }))
-        completeStep(1)
-      }
-      setUploadState((prev) => ({ ...prev, progress }))
-    }, 500)
-  }
-
-  const handleFile = (file: File) => {
-    const maxSize = 25 * 1024 * 1024 // 25MB
-    const allowedTypes = ["image/png", "image/svg+xml", "application/pdf", "image/gif", "image/jpeg"]
+  const handleFile = async (file: File) => {
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    const allowedTypes = ["application/pdf"]
 
     if (file.size > maxSize || !allowedTypes.includes(file.type)) {
       setUploadState({
@@ -119,7 +98,40 @@ export default function OnboardingPage() {
       return
     }
 
-    simulateUpload(file)
+    // Start upload
+    setUploadState({
+      status: "uploading",
+      progress: 0,
+      fileName: file.name,
+      fileSize: formatFileSize(file.size),
+    })
+
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/parse-resume", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Upload failed")
+      }
+
+      const data = await response.json()
+      setUploadState((prev) => ({ ...prev, status: "success", progress: 100 }))
+      completeStep(1)
+      completeStep(2)
+    } catch (error) {
+      console.error("Error uploading file:", error)
+      setUploadState({
+        status: "error",
+        progress: 0,
+        fileName: file.name,
+        fileSize: formatFileSize(file.size),
+      })
+    }
   }
 
   const handleDrop = (e: React.DragEvent) => {
@@ -146,12 +158,6 @@ export default function OnboardingPage() {
     setCurrentStep(1)
     setCompletedSteps([])
   }
-
-  useEffect(() => {
-    if (uploadState.status === "success" && currentStep <= steps.length && !loading) {
-      completeStep(currentStep)
-    }
-  }, [currentStep, uploadState.status, loading]) // Added loading to dependencies
 
   const getStepStatus = (stepId: number) => {
     if (completedSteps.includes(stepId)) return "completed"
@@ -224,6 +230,8 @@ export default function OnboardingPage() {
     }
   }
 
+    const progressHeight = `${((completedSteps.length) / (steps.length - 1)) * 100}%`
+
   return (
     <div className="container mx-auto py-12 space-y-12">
       <div className="text-center">
@@ -236,17 +244,26 @@ export default function OnboardingPage() {
           <CardHeader>
             <CardTitle>Upload Resume</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
               <input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
                 onChange={handleFileInput}
-                accept=".png,.svg,.pdf,.gif,.jpg,.jpeg"
+                accept=".pdf"
               />
               {renderUploadContent()}
             </div>
+            {uploadState.status === "success" && (
+              <Button 
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full"
+              >
+                {isSubmitting ? "Processing..." : "Submit Resume"}
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -256,11 +273,11 @@ export default function OnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="relative">
-              <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-muted">
+              <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-muted" style={{ height: "calc(100% - 4rem)" }}>
                 <div
                   className="absolute top-0 w-full bg-primary transition-all duration-500 ease-in-out"
                   style={{
-                    height: `${(completedSteps.length / (steps.length - 1)) * 100}%`,
+                    height: progressHeight,
                   }}
                 />
               </div>
@@ -277,7 +294,7 @@ export default function OnboardingPage() {
                     >
                       <div
                         className={cn(
-                          "relative flex items-center justify-center w-12 h-12 rounded-full border-2",
+                          "relative flex items-center justify-center w-12 h-12 rounded-full border-2 bg-background",
                           status === "completed"
                             ? "border-primary bg-primary"
                             : status === "current"

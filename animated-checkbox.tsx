@@ -4,28 +4,28 @@ import { Check } from 'lucide-react';
 const steps = [
   {
     id: 1,
-    title: 'Choose shop system',
-    subtitle: 'What is the system of your store',
+    title: 'Uploading File',
+    subtitle: 'Please wait while we upload your file',
   },
   {
     id: 2,
-    title: 'Provide industry',
-    subtitle: 'What is your industry of store',
+    title: 'Parsing File',
+    subtitle: 'Please wait while we parse your file',
   },
   {
     id: 3,
-    title: 'Provide domain',
-    subtitle: 'Provide your primary domain',
+    title: 'Generating Job titles',
+    subtitle: 'This may take a while',
   },
   {
     id: 4,
-    title: 'Connect Google Accounts',
-    subtitle: 'Google Ads, Google Analytics, Google Tag Manager, and Google Search Analytics',
+    title: 'Scraping Jobs for you',
+    subtitle: 'This may take a while',
   },
   {
     id: 5,
-    title: 'Add product URL',
-    subtitle: 'Dummy data of the printing',
+    title: 'Matching your resume',
+    subtitle: 'This may take a while',
   },
 ];
 

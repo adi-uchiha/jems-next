@@ -2,12 +2,13 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
-import { FileIcon, CheckIcon, TrashIcon, Check } from "lucide-react"
+import { FileIcon, CheckIcon, TrashIcon, Loader2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface UploadState {
   status: "idle" | "uploading" | "error" | "success"
@@ -25,28 +26,28 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: "Uploading File",
-    subtitle: "Please wait while we upload your file",
+    title: "Upload Resume",
+    subtitle: "This may take a while",
   },
   {
     id: 2,
     title: "Parsing Resume",
-    subtitle: "Using AI to analyze your resume",
+    subtitle: "Using AI to extract text from your resume",
   },
   {
     id: 3,
-    title: "Generating Job titles",
-    subtitle: "This may take a while",
+    title: "Saving your resume",
+    subtitle: "Saving your resume to our database",
   },
   {
     id: 4,
-    title: "Scraping Jobs for you",
+    title: "Finding Jobs",
     subtitle: "This may take a while",
   },
   {
     id: 5,
     title: "Matching your resume",
-    subtitle: "This may take a while",
+    subtitle: "Finding jobs that match your resume",
   },
 ]
 
@@ -98,40 +99,104 @@ export default function OnboardingPage() {
       return
     }
 
-    // Start upload
+    // Just set file info initially without uploading
     setUploadState({
-      status: "uploading",
+      status: "success", // Changed from "uploading" to "success"
       progress: 0,
       fileName: file.name,
       fileSize: formatFileSize(file.size),
     })
+  }
 
+  const handleUpload = async (file: File) => {
+    setUploadState(prev => ({ ...prev, status: "uploading" }))
+    
     try {
       const formData = new FormData()
       formData.append("file", file)
+
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadState(prev => ({
+          ...prev,
+          progress: Math.min(prev.progress + 10, 90) // Goes up to 90%
+        }))
+      }, 500)
 
       const response = await fetch("/api/parse-resume", {
         method: "POST",
         body: formData,
       })
 
+      clearInterval(progressInterval)
+
       if (!response.ok) {
         throw new Error("Upload failed")
       }
 
       const data = await response.json()
-      setUploadState((prev) => ({ ...prev, status: "success", progress: 100 }))
-      completeStep(1)
-      completeStep(2)
+      setUploadState(prev => ({ ...prev, progress: 100 }))
+      await completeStep(1) // Complete upload step
+      await completeStep(2) // Complete parsing step
+      
     } catch (error) {
       console.error("Error uploading file:", error)
-      setUploadState({
+      setUploadState(prev => ({
+        ...prev,
         status: "error",
         progress: 0,
-        fileName: file.name,
-        fileSize: formatFileSize(file.size),
-      })
+      }))
     }
+  }
+
+  const processSteps = async () => {
+    setIsSubmitting(true)
+    
+    try {
+      // Get the current file
+      const currentFile = fileInputRef.current?.files?.[0]
+      if (!currentFile) throw new Error('No file selected')
+
+      // Handle upload and parsing first
+      await handleUpload(currentFile)
+      
+      // Continue with remaining steps...
+      // Step 3: Save Resume
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Small delay for UI
+      const saveResponse = await fetch('/api/save-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ /* any required data */ })
+      })
+      if (!saveResponse.ok) throw new Error('Failed to save resume')
+      await completeStep(3)
+      
+      // Step 4: Find Jobs
+      const findJobsResponse = await fetch('/api/find-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!findJobsResponse.ok) throw new Error('Failed to find jobs')
+      await completeStep(4)
+      
+      // Step 5: Match Jobs
+      const matchJobsResponse = await fetch('/api/match-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!matchJobsResponse.ok) throw new Error('Failed to match jobs')
+      await completeStep(5)
+      
+    } catch (error) {
+      console.error('Error during processing:', error)
+      // Handle error appropriately
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async () => {
+    await processSteps()
   }
 
   const handleDrop = (e: React.DragEvent) => {
@@ -161,7 +226,8 @@ export default function OnboardingPage() {
 
   const getStepStatus = (stepId: number) => {
     if (completedSteps.includes(stepId)) return "completed"
-    if (stepId === currentStep) return "current"
+    // Only show current status spinner if processing has started
+    if (stepId === currentStep && isSubmitting) return "current"
     return "pending"
   }
 
@@ -230,40 +296,69 @@ export default function OnboardingPage() {
     }
   }
 
-    const progressHeight = `${((completedSteps.length) / (steps.length - 1)) * 100}%`
+  const progressHeight = `${Math.min((completedSteps.length / (steps.length - 1)) * 100, 100)}%`
 
   return (
-    <div className="container mx-auto py-12 space-y-12">
+    <div className="container mx-auto py-6 md:py-12 px-4 space-y-8 md:space-y-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Welcome to JEMS</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Welcome to JEMS</h1>
         <p className="mt-2 text-sm text-muted-foreground">Find better jobs easily by uploading your resume</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        <Card className="h-fit">
           <CardHeader>
             <CardTitle>Upload Resume</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                onChange={handleFileInput}
-                accept=".pdf"
-              />
-              {renderUploadContent()}
-            </div>
-            {uploadState.status === "success" && (
-              <Button 
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full"
+          <CardContent>
+            <motion.div 
+              className="min-h-[300px] flex flex-col"
+              layout // Add layout prop for smooth animations
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <motion.div 
+                className="flex-1 flex flex-col justify-center"
+                layout // Add layout prop here too
+                onDragOver={handleDragOver} 
+                onDragLeave={handleDragLeave} 
+                onDrop={handleDrop}
               >
-                {isSubmitting ? "Processing..." : "Submit Resume"}
-              </Button>
-            )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileInput}
+                  accept=".pdf"
+                />
+                {renderUploadContent()}
+              </motion.div>
+              <AnimatePresence mode="popLayout"> {/* Add mode="popLayout" */}
+                {uploadState.status === "success" && uploadState.progress === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-4"
+                    layout // Add layout prop here as well
+                  >
+                    <Button 
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className="w-full"
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Processing...
+                        </span>
+                      ) : (
+                        "Submit Resume"
+                      )}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </CardContent>
         </Card>
 
@@ -273,41 +368,58 @@ export default function OnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="relative">
-              <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-muted" style={{ height: "calc(100% - 4rem)" }}>
-                <div
-                  className="absolute top-0 w-full bg-primary transition-all duration-500 ease-in-out"
-                  style={{
-                    height: progressHeight,
+              <motion.div 
+                className="absolute left-4 top-8 w-0.5 bg-muted"
+                style={{ 
+                  height: `${(steps.length - 1) * 40}px` // Adjust based on your spacing
+                }}
+              >
+                <motion.div
+                  className="absolute top-0 w-full bg-primary origin-top"
+                  initial={{ scaleY: 0 }}
+                  animate={{ 
+                    scaleY: Math.min(completedSteps.length / (steps.length - 1), 1) 
                   }}
+                  transition={{ duration: 0.5 }}
+                  style={{ height: "100%" }}
                 />
-              </div>
-              <div className="relative space-y-8">
+              </motion.div>
+              <div className="relative space-y-6">
                 {steps.map((step) => {
                   const status = getStepStatus(step.id)
                   return (
                     <div
                       key={step.id}
                       className={cn(
-                        "flex items-start gap-4 transition-opacity duration-300",
+                        "flex items-start gap-4 transition-opacity duration-300 h-10", // Add fixed height
                         status === "pending" ? "opacity-50" : "opacity-100",
                       )}
                     >
                       <div
                         className={cn(
-                          "relative flex items-center justify-center w-12 h-12 rounded-full border-2 bg-background",
+                          "relative flex items-center justify-center w-8 h-8 rounded-full border-2 bg-background",
                           status === "completed"
                             ? "border-primary bg-primary"
                             : status === "current"
-                              ? "border-primary animate-pulse"
+                              ? "border-primary"
                               : "border-muted",
                         )}
                       >
-                        {status === "completed" && <Check className="w-6 h-6 text-primary-foreground" />}
-                        {status === "current" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                        {status === "completed" ? (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          >
+                            <CheckIcon className="w-4 h-4 text-primary-foreground" />
+                          </motion.div>
+                        ) : status === "current" ? (
+                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                        ) : null}
                       </div>
-                      <div className="pt-2">
-                        <h3 className="font-medium">{step.title}</h3>
-                        <p className="text-sm text-muted-foreground">{step.subtitle}</p>
+                      <div className="pt-1">
+                        <h3 className="text-sm font-medium">{step.title}</h3>
+                        <p className="text-xs text-muted-foreground">{step.subtitle}</p>
                       </div>
                     </div>
                   )

@@ -415,7 +415,7 @@ export default function OnboardingPage() {
                           >
                             <CheckIcon className="w-4 h-4 text-primary-foreground" />
                           </motion.div>
-                        ) : status === "current" ? (
+                        ) : status === "current" && isSubmitting ? (
                           <Loader2 className="w-4 h-4 text-primary animate-spin" />
                         ) : null}
                       </div>

@@ -79,7 +79,7 @@ export default function OnboardingPage() {
 
   const completeStep = async (stepId: number) => {
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     setCompletedSteps((prev) => [...prev, stepId])
     setCurrentStep(stepId + 1)
     setLoading(false)
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
       
       // Continue with remaining steps...
       // Step 3: Save Resume
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Small delay for UI
+      await new Promise(resolve => setTimeout(resolve, 500)) // Small delay for UI
       const saveResponse = await fetch('/api/save-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -279,7 +279,7 @@ export default function OnboardingPage() {
         return (
           <div
             className={cn(
-              "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer",
+              "border-[1px] border-dashed rounded-lg p-6 text-center cursor-pointer",
               isDragging ? "border-primary" : "border-muted",
               "hover:border-primary transition-colors",
             )}
@@ -332,7 +332,7 @@ export default function OnboardingPage() {
                 />
                 {renderUploadContent()}
               </motion.div>
-              <AnimatePresence mode="popLayout"> {/* Add mode="popLayout" */}
+              <AnimatePresence mode="popLayout"> {/* Add mode="popLayout" Add submit button*/} 
                 {uploadState.status === "success" && uploadState.progress === 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -369,10 +369,10 @@ export default function OnboardingPage() {
           <CardContent>
             <div className="relative">
               <motion.div 
-                className="absolute left-4 top-8 w-0.5 bg-muted"
+                className="absolute left-4 top-4 w-0.5 bg-muted"
                 style={{ 
                   // Calculate height to reach center of last circle
-                  height: `${((steps.length - 1) * 40) + 16}px` // 40px per step spacing + 16px to center
+                  height: `${((steps.length) * 40) + 55}px` 
                 }}
               >
                 <motion.div
@@ -380,7 +380,7 @@ export default function OnboardingPage() {
                   initial={{ scaleY: 0 }}
                   animate={{ 
                     // Adjust scale to stop at last circle's center
-                    scaleY: Math.min(completedSteps.length / steps.length, 1)
+                    scaleY: Math.min((completedSteps.length / steps.length), 1)
                   }}
                   transition={{ duration: 0.5 }}
                   style={{ height: "100%" }}

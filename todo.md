@@ -2,8 +2,10 @@ setup env config for prod and dev
 [x] Add Google SignIn
 [x] Indeed WebScraper
 [x] Glassdoor WebScraper
-[ ] Fix Onboarding Page UI
+[x] Fix Onboarding Page UI
 [ ] Save resume to database.
+[ ] Implement Error Handling in Onboarding UI
+[ ] Implement timer in onBoarding UI
 [ ] Resume Edit Dashboard.
 [ ] Job Queue for scraping???
 [ ] Database Design???

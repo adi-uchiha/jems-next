@@ -139,6 +139,8 @@ export default function OnboardingPage() {
       await completeStep(1) // Complete upload step
       await completeStep(2) // Complete parsing step
       
+      return data // Return the parsed data
+      
     } catch (error) {
       console.error("Error uploading file:", error)
       setUploadState(prev => ({
@@ -146,6 +148,7 @@ export default function OnboardingPage() {
         status: "error",
         progress: 0,
       }))
+      throw error // Re-throw to be handled by processSteps
     }
   }
 
@@ -158,19 +161,22 @@ export default function OnboardingPage() {
       if (!currentFile) throw new Error('No file selected')
 
       // Handle upload and parsing first
-      await handleUpload(currentFile)
+      const uploadResponse = await handleUpload(currentFile)
+      if (!uploadResponse?.resumeData) throw new Error('Failed to parse resume')
       
-      // Continue with remaining steps...
-      // Step 3: Save Resume
-      await new Promise(resolve => setTimeout(resolve, 500)) // Small delay for UI
+      // Save the parsed resume data
       const saveResponse = await fetch('/api/save-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ /* any required data */ })
+        body: JSON.stringify({ 
+          resumeData: uploadResponse.resumeData
+        })
       })
+      console.log("Save resume response:", saveResponse)
       if (!saveResponse.ok) throw new Error('Failed to save resume')
       await completeStep(3)
       
+      // Rest of your existing steps...
       // Step 4: Find Jobs
       const findJobsResponse = await fetch('/api/find-jobs', {
         method: 'POST',

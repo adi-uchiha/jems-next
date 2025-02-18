@@ -1,5 +1,5 @@
 CREATE TABLE resumes (
-    id TEXT PRIMARY KEY NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId TEXT NOT NULL,
     title TEXT NOT NULL,
     filePath TEXT,
@@ -10,13 +10,12 @@ CREATE TABLE resumes (
     personalInfoEmail TEXT NOT NULL,
     personalInfoLinkedIn TEXT,
     personalInfoGithub TEXT,
-    education TEXT NOT NULL,  -- JSON array
-    experience TEXT NOT NULL, -- JSON array
-    projects TEXT NOT NULL,    -- JSON array
-    technicalSkills TEXT NOT NULL,  -- JSON array
-    certificationsAchievements TEXT NOT NULL,  -- JSON array
+    education TEXT NOT NULL, -- JSON array
+    experience TEXT NOT NULL,-- JSON array
+    projects TEXT NOT NULL, -- JSON array
+    technicalSkills TEXT NOT NULL, -- JSON array
+    certificationsAchievements TEXT NOT NULL, -- JSON array
     createdAt DATETIME NOT NULL,
     updatedAt DATETIME NOT NULL,
     FOREIGN KEY (userId) REFERENCES user(id)
 );
-

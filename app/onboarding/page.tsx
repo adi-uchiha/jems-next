@@ -139,8 +139,6 @@ export default function OnboardingPage() {
       await completeStep(1) // Complete upload step
       await completeStep(2) // Complete parsing step
       
-      return data // Return the parsed data
-      
     } catch (error) {
       console.error("Error uploading file:", error)
       setUploadState(prev => ({
@@ -148,7 +146,6 @@ export default function OnboardingPage() {
         status: "error",
         progress: 0,
       }))
-      throw error // Re-throw to be handled by processSteps
     }
   }
 
@@ -156,6 +153,9 @@ export default function OnboardingPage() {
     setIsSubmitting(true)
     
     try {
+      // Get the current file
+      const currentFile = fileInputRef.current?.files?.[0]
+      if (!currentFile) throw new Error('No file selected')
 
       // Handle upload and parsing first
       await handleUpload(currentFile)

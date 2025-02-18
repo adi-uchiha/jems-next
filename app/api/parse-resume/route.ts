@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"
 import { NextResponse } from "next/server"
 import { GoogleGenerativeAI, GoogleGenerativeAIError } from "@google/generative-ai"
 import { headers } from "next/headers"
+import { promptTemplate } from "./prompt"
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
 
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
     const session = await auth.api.getSession({
       headers: await headers(),
     })
-
+    // console.log(session)
     if (!session) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -25,6 +26,13 @@ export async function POST(req: Request) {
         }
       )
     }
+    //Testing purposes only - remove before production
+    // return NextResponse.json(
+    //   {
+    //     success: true,
+    //     message: "Parse resume response"
+    //   }
+    // )
 
     // Validate content type
     const contentType = req.headers.get('content-type')
@@ -64,32 +72,7 @@ export async function POST(req: Request) {
     // Create prompt for Gemini with file data
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    const prompt = `Please analyze this resume and provide the following information in JSON format:
-    {
-      "personalInfo": {
-        "name": "",
-        "email": "",
-        "phone": "",
-        "location": ""
-      },
-      "education": [{
-        "degree": "",
-        "institution": "",
-        "year": "",
-        "gpa": ""
-      }],
-      "experience": [{
-        "title": "",
-        "company": "",
-        "duration": "",
-        "responsibilities": []
-      }],
-      "skills": [],
-      "certifications": []
-    }
-    
-    Please ensure all fields are properly filled based on the resume content.
-    Return ONLY the JSON, with no additional text.`
+    const prompt = promptTemplate
 
     // Send to Gemini with the PDF file
     const result = await model.generateContent([
@@ -101,23 +84,26 @@ export async function POST(req: Request) {
         }
       }
     ])
-    console.log("Gemini response:", result)
+    // console.log("Gemini response:", result)
     const response = await result.response
     const analysis = response.text()
-    console.log("Analysis:", analysis)
-    return NextResponse.json(
-      { analysis: "Done" },
-      { 
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-    )
+    // console.log("Analysis:", analysis)
+    
     try {
-      // Parse the response to ensure it's valid JSON
-      const parsedAnalysis = JSON.parse(analysis.trim())
+      // Remove ```json and ``` from the response
+      const cleanedAnalysis = analysis
+        .replace(/```json\s*/g, '')    // Remove ```json anywhere in the text
+        .replace(/```\s*$/g, '')       // Remove trailing ```
+        .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
+        .split('\n')                   // Split into lines
+        .filter(line => line.trim())   // Remove empty lines
+        .join('\n'); 
+      
+      // Parse the cleaned response
+      const parsedAnalysis = JSON.parse(cleanedAnalysis.trim())
+      
       return NextResponse.json(
-        { analysis: parsedAnalysis },
+        { resumeData: parsedAnalysis },
         { 
           headers: {
             'Content-Type': 'application/json',
@@ -126,6 +112,8 @@ export async function POST(req: Request) {
       )
     } catch (error) {
       console.error("Error parsing Gemini response:", error)
+      // console.log("Cleaned content:", cleanedAnalysis)
+
       return NextResponse.json(
         { error: "Failed to parse resume data" },
         { 

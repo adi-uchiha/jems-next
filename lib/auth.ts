@@ -18,24 +18,13 @@ import { MysqlDialect } from "kysely";
 import { createPool } from "mysql2/promise";
 import { nextCookies } from "better-auth/next-js";
 import { passkey } from "better-auth/plugins/passkey";
+import { libsql } from "./database/db";
 
 const from = process.env.BETTER_AUTH_EMAIL || "delivered@resend.dev";
 const to = process.env.TEST_EMAIL || "";
 
-const libsql = new LibsqlDialect({
-	url: process.env.TURSO_DATABASE_URL || "",
-	authToken: process.env.TURSO_AUTH_TOKEN || "",
-});
+const dialect = libsql //To pass the dialect to the auth function
 
-const mysql = process.env.USE_MYSQL
-	? new MysqlDialect(createPool(process.env.MYSQL_DATABASE_URL || ""))
-	: null;
-
-const dialect = process.env.USE_MYSQL ? mysql : libsql;
-
-if (!dialect) {
-	throw new Error("No dialect found");
-}
 
 export const auth = betterAuth({
 	appName: "JEMS",
@@ -118,10 +107,9 @@ export const auth = betterAuth({
 						inviteLink:
 							process.env.NODE_ENV === "development"
 								? `http://localhost:3000/accept-invitation/${data.id}`
-								: `${
-										process.env.BETTER_AUTH_URL ||
-										"https://demo.better-auth.com"
-									}/accept-invitation/${data.id}`,
+								: `${process.env.BETTER_AUTH_URL ||
+								"https://demo.better-auth.com"
+								}/accept-invitation/${data.id}`,
 					}),
 				});
 			},

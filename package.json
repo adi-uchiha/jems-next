@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "dotenv -- tsx lib/database/migrations.ts",
+    "db:generate": "tsx scripts/generate-migration.ts"
   },
   "dependencies": {
     "@better-fetch/fetch": "1.1.12",
@@ -94,6 +96,7 @@
     "eslint-config-next": "15.0.0-canary.149",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
   "overrides": {

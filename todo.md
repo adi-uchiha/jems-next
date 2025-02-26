@@ -3,18 +3,20 @@ setup env config for prod and dev
 [x] Indeed WebScraper
 [x] Glassdoor WebScraper
 [x] Fix Onboarding Page UI
-[ ] Save resume to database.
+[x] Save resume to database.
+
 [ ] Implement Error Handling in Onboarding UI
-[ ] Implement timer in onBoarding UI
 [ ] Resume Edit Dashboard.
-[ ] Job Queue for scraping???
-[ ] Database Design???
-[ ] Dashboard and UI design
-[ ] Integrate into FastAPI backend
-[ ] Rebranding the logo and name 
-[ ] Implement vercel/ai sdk
+[ ] Implement vercel/ai sdk, Generative UI.
+[ ] Dashboard and UI design.
+[ ] Starter messages in send message UI
+[ ] Integrate into FastAPI backend.
+[ ] Rebranding the logo and name.
+[ ] Implement timer in onBoarding UI.
 
-
+SWE: 
+? Job Queues | Scraping Status
+? Database Schema
 
 Macro Tasks as per importance: 
 
@@ -25,11 +27,12 @@ How LLM Makes Google Searches
 Auto Employee, HR out reach Agent
 All job Stage Tracker
 Employer Assignment Option
+Employer dashboard
 Video Introductions of candidate 
 Skill Gap Analysis
 Amcat and other scores
 Connect Leetcode & Github
 Edit and enhance resume To jakes resume
-Auto Resume Personalizer
+Auto Resume Personalizer and enrichment
 Auto Apply Agent
 Certifcation Recommendation

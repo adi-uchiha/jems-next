@@ -2,13 +2,14 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
-import { FileIcon, CheckIcon, TrashIcon, Loader2 } from "lucide-react"
+import { FileIcon, CheckIcon, TrashIcon, Loader2, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 interface UploadState {
   status: "idle" | "uploading" | "error" | "success"
@@ -62,6 +63,7 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -433,6 +435,30 @@ export default function OnboardingPage() {
                   )
                 })}
               </div>
+              <AnimatePresence mode="popLayout">
+                {completedSteps.length === steps.length && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="mt-8"
+                  >
+                    <Button 
+                      onClick={() => router.push('/edit-resume')}
+                      className="w-full group relative"
+                      variant="secondary"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        Continue to Edit Resume
+                        <ArrowRight className="w-4 h-4 transform transition-transform duration-200 group-hover:translate-x-1" />
+                      </span>
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Review your parsed resume
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </CardContent>
         </Card>

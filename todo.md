@@ -5,6 +5,7 @@ setup env config for prod and dev
 [x] Fix Onboarding Page UI
 [x] Save resume to database.
 
+[ ] Edit resume portal
 [ ] Implement Error Handling in Onboarding UI
 [ ] Resume Edit Dashboard.
 [ ] Implement vercel/ai sdk, Generative UI.

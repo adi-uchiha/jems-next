@@ -10,7 +10,7 @@ export async function SignInButton() {
 
 	return (
 		<Link
-			href={session?.session ? "/dashboard" : "/sign-in"}
+			href={session?.session ? "/onboarding" : "/sign-in"}
 			className="flex justify-center"
 		>
 			<Button className="gap-2  justify-between" variant="default">
@@ -36,7 +36,7 @@ export async function SignInButton() {
 						<path fill="currentColor" d="M2 3h20v18H2zm18 16V7H4v12z"></path>
 					</svg>
 				)}
-				<span>{session?.session ? "Dashboard" : "Sign In"}</span>
+				<span>{session?.session ? "Chat" : "Sign In"}</span>
 			</Button>
 		</Link>
 	);

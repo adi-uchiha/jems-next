@@ -9,6 +9,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { jobs } from "@/app/api/chat/jobs"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MessagesSquare } from "lucide-react"
+import ReactMarkdown from 'react-markdown'
 
 interface Message {
   role: "user" | "assistant"
@@ -44,6 +52,30 @@ const getSourceIcon = (source: string) => {
     default:
       return <Globe className="w-4 h-4" />
   }
+}
+
+// Add this constant before the ChatPage component
+const QUICK_MESSAGES = [
+  "Can you find jobs for me",
+  "How can I improve my resume",
+  "Which certifications should I pursue",
+  "What jobs should I target?"
+] as const
+
+// Add this helper function for markdown styling
+const MarkdownStyles = {
+  p: "mb-4",
+  h1: "text-2xl font-bold mb-4",
+  h2: "text-xl font-bold mb-3",
+  h3: "text-lg font-bold mb-2",
+  ul: "list-disc pl-6 mb-4",
+  ol: "list-decimal pl-6 mb-4",
+  li: "mb-1",
+  strong: "font-bold",
+  em: "italic",
+  blockquote: "border-l-4 border-primary pl-4 italic mb-4",
+  code: "bg-muted rounded px-1 py-0.5",
+  pre: "bg-muted rounded p-4 mb-4 overflow-x-auto",
 }
 
 export default function ChatPage() {
@@ -140,7 +172,29 @@ export default function ChatPage() {
                       : "bg-primary text-primary-foreground"
                     }`}
                   >
-                    <div>{message.content}</div>
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className={MarkdownStyles.p}>{children}</p>,
+                          h1: ({ children }) => <h1 className={MarkdownStyles.h1}>{children}</h1>,
+                          h2: ({ children }) => <h2 className={MarkdownStyles.h2}>{children}</h2>,
+                          h3: ({ children }) => <h3 className={MarkdownStyles.h3}>{children}</h3>,
+                          ul: ({ children }) => <ul className={MarkdownStyles.ul}>{children}</ul>,
+                          ol: ({ children }) => <ol className={MarkdownStyles.ol}>{children}</ol>,
+                          li: ({ children }) => <li className={MarkdownStyles.li}>{children}</li>,
+                          strong: ({ children }) => <strong className={MarkdownStyles.strong}>{children}</strong>,
+                          em: ({ children }) => <em className={MarkdownStyles.em}>{children}</em>,
+                          blockquote: ({ children }) => (
+                            <blockquote className={MarkdownStyles.blockquote}>{children}</blockquote>
+                          ),
+                          code: ({ children }) => <code className={MarkdownStyles.code}>{children}</code>,
+                          pre: ({ children }) => <pre className={MarkdownStyles.pre}>{children}</pre>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                    
                     {message.jobRecommendations && message.jobRecommendations.length > 0 && (
                       <div className="space-y-2">
                         <h3 className="font-semibold text-sm">Recommended Jobs:</h3>
@@ -200,21 +254,47 @@ export default function ChatPage() {
             </AnimatePresence>
           </ScrollArea>
 
-          <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-            </Button>
+          <form onSubmit={handleSubmit} className="mt-4 space-y-2">
+            <div className="flex gap-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                disabled={isLoading}
+                className="flex-1"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    disabled={isLoading}
+                  >
+                    <MessagesSquare className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  {QUICK_MESSAGES.map((message) => (
+                    <DropdownMenuItem
+                      key={message}
+                      onClick={() => {
+                        setInput(message)
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {message}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

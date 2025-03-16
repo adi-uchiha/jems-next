@@ -199,7 +199,7 @@ export function SignUp() {
 							onClick={async () => {
 								await signIn.social({
 									provider: "google",
-									callbackURL: "/dashboard",
+									callbackURL: "/onboarding",
 								});
 							}}
 						>

@@ -4,18 +4,22 @@ setup env config for prod and dev
 [x] Glassdoor WebScraper
 [x] Fix Onboarding Page UI
 [x] Save resume to database.
+[x] Edit resume portal
 
-[ ] Edit resume portal
+[ ] Integrate scrapers
+[ ] Pinecone database design
+[ ] Dashboard.
 [ ] Implement Error Handling in Onboarding UI
-[ ] Resume Edit Dashboard.
 [ ] Implement vercel/ai sdk, Generative UI.
 [ ] Dashboard and UI design.
 [ ] Starter messages in send message UI
 [ ] Integrate into FastAPI backend.
 [ ] Rebranding the logo and name.
 [ ] Implement timer in onBoarding UI.
+[ ] Github Code based matching using github API
 
 SWE: 
+? RabbitMQ??
 ? Job Queues | Scraping Status
 ? Database Schema
 

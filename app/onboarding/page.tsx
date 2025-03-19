@@ -2,20 +2,22 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
-import { FileIcon, CheckIcon, TrashIcon, Loader2, ArrowRight } from "lucide-react"
+import { FileIcon, CheckIcon, Loader2, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { UploadDropzone } from "@/utils/uploadthing"
+import { useUploadThing } from "@/utils/uploadthing"
 
 interface UploadState {
   status: "idle" | "uploading" | "error" | "success"
   progress: number
   fileName?: string
   fileSize?: string
+  fileUrl?: string
 }
 
 interface Step {
@@ -54,7 +56,6 @@ const steps: Step[] = [
 
 export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
   const [uploadState, setUploadState] = useState<UploadState>({
     status: "idle",
     progress: 0,
@@ -65,20 +66,6 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  const formatFileSize = (bytes: number) => {
-    return `${Math.round(bytes / 1024)} KB`
-  }
-
   const completeStep = async (stepId: number) => {
     setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 500))
@@ -87,98 +74,33 @@ export default function OnboardingPage() {
     setLoading(false)
   }
 
-  const handleFile = async (file: File) => {
-    const maxSize = 5 * 1024 * 1024 // 5MB
-    const allowedTypes = ["application/pdf"]
-
-    if (file.size > maxSize || !allowedTypes.includes(file.type)) {
-      setUploadState({
-        status: "error",
-        progress: 0,
-        fileName: file.name,
-        fileSize: formatFileSize(file.size),
-      })
-      return
-    }
-
-    // Just set file info initially without uploading
-    setUploadState({
-      status: "success", // Changed from "uploading" to "success"
-      progress: 0,
-      fileName: file.name,
-      fileSize: formatFileSize(file.size),
-    })
-  }
-
-  const handleUpload = async (file: File) => {
-    setUploadState(prev => ({ ...prev, status: "uploading" }))
-    
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadState(prev => ({
-          ...prev,
-          progress: Math.min(prev.progress + 10, 90) // Goes up to 90%
-        }))
-      }, 500)
-
-      const response = await fetch("/api/parse-resume", {
-        method: "POST",
-        body: formData,
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        throw new Error("Upload failed")
-      }
-
-      const data = await response.json()
-      setUploadState(prev => ({ ...prev, progress: 100 }))
-      await completeStep(1) // Complete upload step
-      await completeStep(2) // Complete parsing step
-      
-      return data // Return the parsed data
-      
-    } catch (error) {
-      console.error("Error uploading file:", error)
-      setUploadState(prev => ({
-        ...prev,
-        status: "error",
-        progress: 0,
-      }))
-      throw error // Re-throw to be handled by processSteps
-    }
-  }
-
   const processSteps = async () => {
     setIsSubmitting(true)
-    
-    try {
-      // Get the current file
-      const currentFile = fileInputRef.current?.files?.[0]
-      if (!currentFile) throw new Error('No file selected')
 
-      // Handle upload and parsing first
-      const uploadResponse = await handleUpload(currentFile)
-      if (!uploadResponse?.resumeData) throw new Error('Failed to parse resume')
-      
-      // Save the parsed resume data
+    try {
+      if (!uploadState.fileUrl) throw new Error('No file URL available')
+
+      // Step 2: Parse Resume
+      const parseResponse = await fetch("/api/parse-resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUrl: uploadState.fileUrl }),
+      })
+      if (!parseResponse.ok) throw new Error('Failed to parse resume')
+      const parsedData = await parseResponse.json()
+      await completeStep(2)
+      console.log("Parsed Data", parsedData)
+
+      // Step 3: Save the parsed resume data
       const saveResponse = await fetch('/api/save-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          resumeData: uploadResponse.resumeData
-        })
+        body: JSON.stringify({ resumeData: parsedData.resumeData })
       })
       console.log("Save resume response:", saveResponse)
       if (!saveResponse.ok) throw new Error('Failed to save resume')
       await completeStep(3)
-      
-      // Rest of your existing steps...
+
       // Step 4: Find Jobs
       const findJobsResponse = await fetch('/api/find-jobs', {
         method: 'POST',
@@ -186,7 +108,7 @@ export default function OnboardingPage() {
       })
       if (!findJobsResponse.ok) throw new Error('Failed to find jobs')
       await completeStep(4)
-      
+
       // Step 5: Match Jobs
       const matchJobsResponse = await fetch('/api/match-jobs', {
         method: 'POST',
@@ -194,7 +116,7 @@ export default function OnboardingPage() {
       })
       if (!matchJobsResponse.ok) throw new Error('Failed to match jobs')
       await completeStep(5)
-      
+
     } catch (error) {
       console.error('Error during processing:', error)
       // Handle error appropriately
@@ -207,34 +129,8 @@ export default function OnboardingPage() {
     await processSteps()
   }
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-
-    const file = e.dataTransfer.files[0]
-    if (file) handleFile(file)
-  }
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
-  }
-
-  const handleReset = () => {
-    setUploadState({
-      status: "idle",
-      progress: 0,
-    })
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
-    setCurrentStep(1)
-    setCompletedSteps([])
-  }
-
   const getStepStatus = (stepId: number) => {
     if (completedSteps.includes(stepId)) return "completed"
-    // Only show current status spinner if processing has started
     if (stepId === currentStep && isSubmitting) return "current"
     return "pending"
   }
@@ -251,14 +147,13 @@ export default function OnboardingPage() {
                 <span>{uploadState.fileName}</span>
               </div>
               <p className="mb-3">Please try again</p>
-              <Button variant="outline" onClick={handleReset}>
+              <Button variant="outline" onClick={() => setUploadState({ status: "idle", progress: 0 })}>
                 Try again
               </Button>
             </AlertDescription>
           </Alert>
         )
 
-      case "uploading":
       case "success":
         return (
           <div className="space-y-4">
@@ -267,44 +162,26 @@ export default function OnboardingPage() {
                 <FileIcon className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">{uploadState.fileName}</p>
-                  <p className="text-sm text-muted-foreground">{uploadState.fileSize}</p>
                 </div>
               </div>
-              {uploadState.status === "success" ? (
-                <CheckIcon className="w-5 h-5 text-primary" />
-              ) : (
-                <Button variant="ghost" size="icon" onClick={handleReset}>
-                  <TrashIcon className="w-5 h-5" />
-                </Button>
-              )}
+              <CheckIcon className="w-5 h-5 text-primary" />
             </div>
-            <Progress value={uploadState.progress} className="w-full" />
-            <div className="text-right text-sm text-muted-foreground">{Math.round(uploadState.progress)}%</div>
           </div>
         )
 
       default:
         return (
-          <div
-            className={cn(
-              "border-[1px] border-dashed rounded-lg p-6 text-center cursor-pointer",
-              isDragging ? "border-primary" : "border-muted",
-              "hover:border-primary transition-colors",
-            )}
-            onClick={() => fileInputRef.current?.click()}
-          >
+          <div className={cn("border-[1px] border-dashed rounded-lg p-6 text-center cursor-pointer")}>
             <FileIcon className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
             <p>
               <span className="text-primary">Click to upload</span>
               {" or drag and drop"}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">PNG, SVG, PDF, GIF or JPG (max. 25mb)</p>
+            <p className="text-sm text-muted-foreground mt-1">PDF (max. 8mb)</p>
           </div>
         )
     }
   }
-
-  const progressHeight = `${Math.min((completedSteps.length / (steps.length - 1)) * 100, 100)}%`
 
   return (
     <div className="container mx-auto py-6 md:py-12 px-4 space-y-8 md:space-y-12">
@@ -321,33 +198,46 @@ export default function OnboardingPage() {
           <CardContent>
             <motion.div 
               className="min-h-[300px] flex flex-col"
-              layout // Add layout prop for smooth animations
+              layout
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <motion.div 
                 className="flex-1 flex flex-col justify-center"
-                layout // Add layout prop here too
-                onDragOver={handleDragOver} 
-                onDragLeave={handleDragLeave} 
-                onDrop={handleDrop}
+                layout
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileInput}
-                  accept=".pdf"
-                />
-                {renderUploadContent()}
+                {uploadState.status === "success" ? (
+                  renderUploadContent()
+                ) : (
+                  <UploadDropzone
+                    endpoint="uploadResume"
+                    onClientUploadComplete={(res) => {
+                      if (res && res.length > 0) {
+                        setUploadState(prevState => ({
+                          ...prevState,
+                          status: "success",
+                          fileName: res[0].name,
+                          fileUrl: res[0].url,
+                        }))
+                      }
+                    }}
+                    onUploadError={(error) => {
+                      console.error("Upload Error:", error)
+                      setUploadState(prevState => ({
+                        ...prevState,
+                        status: "error",
+                      }))
+                    }}
+                  />
+                )}
               </motion.div>
-              <AnimatePresence mode="popLayout"> {/* Add mode="popLayout" Add submit button*/} 
-                {uploadState.status === "success" && uploadState.progress === 0 && (
+              <AnimatePresence mode="popLayout">
+                {uploadState.status === "success" && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     className="mt-4"
-                    layout // Add layout prop here as well
+                    layout
                   >
                     <Button 
                       onClick={handleSubmit}
@@ -378,18 +268,12 @@ export default function OnboardingPage() {
             <div className="relative">
               <motion.div 
                 className="absolute left-4 top-4 w-0.5 bg-muted"
-                style={{ 
-                  // Calculate height to reach center of last circle
-                  height: `${((steps.length) * 40) + 55}px` 
-                }}
+                style={{ height: `${((steps.length) * 40) + 55}px` }}
               >
                 <motion.div
                   className="absolute top-0 w-full bg-primary origin-top"
                   initial={{ scaleY: 0 }}
-                  animate={{ 
-                    // Adjust scale to stop at last circle's center
-                    scaleY: Math.min((completedSteps.length / steps.length), 1)
-                  }}
+                  animate={{ scaleY: Math.min((completedSteps.length / steps.length), 1) }}
                   transition={{ duration: 0.5 }}
                   style={{ height: "100%" }}
                 />
@@ -401,7 +285,7 @@ export default function OnboardingPage() {
                     <div
                       key={step.id}
                       className={cn(
-                        "flex items-start gap-4 transition-opacity duration-300 h-10", // Add fixed height
+                        "flex items-start gap-4 transition-opacity duration-300 h-10",
                         status === "pending" ? "opacity-50" : "opacity-100",
                       )}
                     >

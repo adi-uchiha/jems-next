@@ -5,6 +5,10 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Wrapper, WrapperWithQuery } from "@/components/wrapper";
 import { createMetadata } from "@/lib/metadata";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
+
 
 export const metadata = createMetadata({
 	title: {
@@ -26,6 +30,9 @@ export default function RootLayout({
 				<link rel="icon" href="/favicon/favicon.ico" sizes="any" />
 			</head>
 			<body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
+			<NextSSRPlugin
+          routerConfig={extractRouterConfig(ourFileRouter)}
+        />
 				<ThemeProvider attribute="class" defaultTheme="dark">
 					<Wrapper>
 						<WrapperWithQuery>{children}</WrapperWithQuery>
@@ -36,3 +43,4 @@ export default function RootLayout({
 		</html>
 	);
 }
+

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "@uploadthing/react/styles.css";
 
 
 @layer base {

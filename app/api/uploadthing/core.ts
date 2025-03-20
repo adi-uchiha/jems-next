@@ -9,7 +9,7 @@ const auth = (req: Request) => ({ id: "fakeId" }); // Replace with your actual a
 
 export const ourFileRouter = {
 	uploadResume: f({
-		pdf: { maxFileSize: "8MB" }, //  Limit to PDFs and reasonable size
+		pdf: { maxFileSize: "8MB" },
 	})
 		.middleware(async ({ req }) => {
 			const user = await auth(req);
@@ -18,8 +18,9 @@ export const ourFileRouter = {
 		})
 		.onUploadComplete(async ({ metadata, file }) => {
 			console.log("Upload complete for userId:", metadata.userId);
-			console.log("File URL:", file.url); // URL of the uploaded file
-			return { uploadedBy: metadata.userId, fileUrl: file.url }; // Return URL to client
+			console.log("File URL:", file.ufsUrl);
+			const response = { uploadedBy: metadata.userId, fileUrl: file.ufsUrl };
+			return response;
 		}),
 } satisfies FileRouter;
 

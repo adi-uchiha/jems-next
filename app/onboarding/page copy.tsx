@@ -28,18 +28,28 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: "Uploading your resume",
-    subtitle: "Sending your resume to uploadthing",
+    title: "Upload Resume",
+    subtitle: "This may take a while",
   },
   {
     id: 2,
-    title: "Reading your resume",
-    subtitle: "Organizing your resume details",
+    title: "Parsing Resume",
+    subtitle: "Using AI to extract text from your resume",
   },
   {
     id: 3,
     title: "Saving your resume",
-    subtitle: "Storing your information for easy access",
+    subtitle: "Saving your resume to our database",
+  },
+  {
+    id: 4,
+    title: "Finding Jobs",
+    subtitle: "This may take a while",
+  },
+  {
+    id: 5,
+    title: "Matching your resume",
+    subtitle: "Finding jobs that match your resume",
   },
 ]
 
@@ -64,39 +74,53 @@ export default function OnboardingPage() {
   }
 
   const processSteps = async () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
-      if (!uploadState.fileUrl) throw new Error('No file URL available');
+      if (!uploadState.fileUrl) throw new Error('No file URL available')
 
-      // Step 2: Parse Resume with LLM
+      // Step 2: Parse Resume
       const parseResponse = await fetch("/api/parse-resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileUrl: uploadState.fileUrl }),
-      });
-      
-      if (!parseResponse.ok) throw new Error('Failed to parse resume');
-      const parsedData = await parseResponse.json();
-      await completeStep(2);
+      })
+      if (!parseResponse.ok) throw new Error('Failed to parse resume')
+      const parsedData = await parseResponse.json()
+      await completeStep(2)
+      console.log("Parsed Data", parsedData)
 
-      // Step 3: Save to Database
+      // Step 3: Save the parsed resume data
       const saveResponse = await fetch('/api/save-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resumeData: parsedData.resumeData })
-      });
+      })
+      console.log("Save resume response:", saveResponse)
+      if (!saveResponse.ok) throw new Error('Failed to save resume')
+      await completeStep(3)
 
-      if (!saveResponse.ok) throw new Error('Failed to save resume');
-      await completeStep(3);
+      // Step 4: Find Jobs
+      const findJobsResponse = await fetch('/api/find-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!findJobsResponse.ok) throw new Error('Failed to find jobs')
+      await completeStep(4)
 
-      router.push('/edit-resume');
+      // Step 5: Match Jobs
+      const matchJobsResponse = await fetch('/api/match-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!matchJobsResponse.ok) throw new Error('Failed to match jobs')
+      await completeStep(5)
 
     } catch (error) {
-      console.error('Error during processing:', error);
-      // toast.error("Failed to process resume");
+      console.error('Error during processing:', error)
+      // Handle error appropriately
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 

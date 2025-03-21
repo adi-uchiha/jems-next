@@ -85,6 +85,17 @@
   display: none;
 }
 @layer components {
+  .glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .neo-blur {
+    background: rgba(20, 20, 30, 0.75);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(60, 60, 80, 0.2);
+  }
   .glass {
     @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl;
   }
@@ -179,6 +190,33 @@
   
   .glow-lg {
     box-shadow: 0 0 25px 0 var(--primary);
+  }
+  .animate-spin-slow {
+    animation: spin 2s linear infinite;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 

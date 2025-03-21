@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { 
@@ -76,7 +77,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside 
+    <motion.aside 
       className={cn(
         "fixed left-0 top-16 h-[calc(100vh-4rem)]",
         "bg-background/80 backdrop-blur-xl border-r border-border/50",
@@ -84,12 +85,23 @@ export function Sidebar() {
         isCollapsed ? "w-16" : "w-64",
         "dark:bg-background/20 dark:border-border/20"
       )}
+      initial={false}
+      animate={{
+        width: isCollapsed ? 64 : 256,
+      }}
+      transition={{
+        duration: 0.3,
+        ease: "easeInOut"
+      }}
     >
       <div className="flex flex-col h-full">
         <Button 
           variant="ghost" 
           size="sm" 
-          className="self-end m-2 text-muted-foreground hover:text-foreground"
+          className={cn(
+            "self-end text-muted-foreground hover:text-foreground",
+            isCollapsed ? "mx-auto my-2" : "m-2"
+          )}
           onClick={toggleSidebar}
         >
           {isCollapsed ? 
@@ -104,32 +116,58 @@ export function Sidebar() {
               key={item.href} 
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                "flex items-center h-10 gap-3 px-3 rounded-md transition-colors",
                 "hover:bg-accent/50 dark:hover:bg-accent/20",
                 pathname === item.href ? 
                   "bg-accent text-accent-foreground dark:bg-accent/30" : 
                   "text-muted-foreground hover:text-foreground"
               )}
             >
-              <item.icon className="h-4 w-4" />
-              {!isCollapsed && (
-                <span className="flex-1">{item.title}</span>
-              )}
+              <div className="flex items-center justify-center w-4 h-4 flex-shrink-0">
+                <item.icon className="w-4 h-4" />
+              </div>
+              
+              <motion.span 
+                className="flex-1 whitespace-nowrap"
+                animate={{
+                  opacity: isCollapsed ? 0 : 1,
+                  display: isCollapsed ? "none" : "block",
+                }}
+                transition={{
+                  duration: 0.2,
+                  delay: isCollapsed ? 0 : 0.1
+                }}
+              >
+                {item.title}
+              </motion.span>
+              
               {!isCollapsed && item.badge && (
-                <span className={cn(
-                  "px-2 py-0.5 text-xs rounded-full",
-                  item.badge === 'New' ? 
-                    "bg-primary/20 text-primary" : 
-                    "bg-muted text-muted-foreground"
-                )}>
+                <motion.span 
+                  className={cn(
+                    "px-2 py-0.5 text-xs rounded-full whitespace-nowrap",
+                    item.badge === 'New' ? 
+                      "bg-primary/20 text-primary" : 
+                      "bg-muted text-muted-foreground"
+                  )}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   {item.badge}
-                </span>
+                </motion.span>
               )}
             </Link>
           ))}
         </nav>
 
-        <div className="mt-auto px-2 pb-4">
+        <motion.div 
+          className="mt-auto px-2 pb-4"
+          animate={{
+            opacity: isCollapsed ? 0 : 1,
+            height: isCollapsed ? 0 : "auto",
+          }}
+          transition={{ duration: 0.2 }}
+        >
           {!isCollapsed && (
             <div className="bg-accent/50 dark:bg-accent/20 rounded-lg p-4">
               <p className="text-sm font-medium mb-2">Need help?</p>
@@ -139,12 +177,12 @@ export function Sidebar() {
                 variant="outline"
               >
                 <HelpCircle className="h-4 w-4" />
-                Support
+                <span>Support</span>
               </Button>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

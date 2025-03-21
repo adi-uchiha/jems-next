@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -67,24 +68,27 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4 px-6 md:px-12",
+        "fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4",
         {
           "bg-background/80 backdrop-blur-md shadow-sm": scrolled,
           "bg-transparent": !scrolled
         }
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
-            J
-          </div>
-          <span className="text-xl font-bold text-foreground">JEMS</span>
+      <div className="container mx-auto flex items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/images/logo.png"
+            alt="JEMS Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
-          <NavigationMenu>
+        {/* Centered Navigation */}
+        <div className="hidden md:flex items-center justify-center flex-1">
+          <NavigationMenu className="mx-auto">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Features</NavigationMenuTrigger>
@@ -134,7 +138,10 @@ const Header = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+        </div>
 
+        {/* Right Section */}
+        <div className="hidden md:flex items-center gap-4">
           <Button
             variant="outline"
             size="icon"
@@ -154,7 +161,7 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Controls */}
         <div className="md:hidden flex items-center gap-4">
           <Button
             variant="outline"
@@ -185,7 +192,7 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-x-0 top-[65px] p-4 bg-background/80 backdrop-blur-md border-b border-border">
             <nav className="flex flex-col space-y-4">

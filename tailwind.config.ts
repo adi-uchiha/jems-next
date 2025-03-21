@@ -127,6 +127,10 @@ const config = {
 				'card-hover': {
 					'0%': { transform: 'translateY(0)' },
 					'100%': { transform: 'translateY(-5px)' }
+				},
+				scroll: {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(-50%)' }
 				}
 			},
 			animation: {
@@ -147,7 +151,8 @@ const config = {
 				'card-hover': 'card-hover 0.3s ease-out forwards',
 				pulse: 'pulse 1.5s ease-in-out infinite',
 				shimmer: 'shimmer 2s linear infinite',
-				'spin-slow': 'spin-slow 3s linear infinite'
+				'spin-slow': 'spin-slow 3s linear infinite',
+				scroll: 'scroll 30s linear infinite'
 			},
 			boxShadow: {
 				input: `0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08)`,

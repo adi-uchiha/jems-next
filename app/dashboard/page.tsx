@@ -1,4 +1,4 @@
-
+'use client'
 import { useState } from "react";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, ZAxis } from "recharts";
 import { Activity, Briefcase, FileSpreadsheet, MessageSquare, SearchCheck, User, Settings, ChevronLeft, ChevronRight, BellIcon, LogOut, CalendarDays, TrendingUp, MapPin, Clock, Award, Zap } from "lucide-react";

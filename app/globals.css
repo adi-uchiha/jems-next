@@ -130,47 +130,39 @@ html {
   transform: rotateY(180deg);
 }
 
-  /* Marquee animation */
-  .marquee {
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-  }
+/* Remove the existing marquee styles and add these new ones */
 
-  .marquee-content {
-    display: inline-block;
-    animation: marquee 30s linear infinite;
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
   }
+  100% {
+    transform: translateX(-50%);
+  }
+}
 
-  .marquee-content:hover {
-    animation-play-state: paused;
-  }
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
 
-  .marquee-item {
-    display: inline-flex;
-    align-items: center;
-    margin: 0 2rem;
-  }
+.animation-play-state-paused {
+  animation-play-state: paused;
+}
 
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
+/* Dashboard styles */
+.dashboard-card {
+  @apply bg-black/30 backdrop-blur-md border border-white/10 rounded-lg;
+}
 
-  /* Dashboard styles */
-  .dashboard-card {
-    @apply bg-black/30 backdrop-blur-md border border-white/10 rounded-lg;
-  }
+.glow {
+  @apply relative;
+}
 
-  .glow {
-    @apply relative;
-  }
-
-  .glow::after {
-    content: '';
-    @apply absolute -inset-px rounded-lg bg-gradient-to-r from-primary/50 to-primary/30 opacity-40 blur-sm;
-    z-index: -1;
-  }
+.glow::after {
+  content: '';
+  @apply absolute -inset-px rounded-lg bg-gradient-to-r from-primary/50 to-primary/30 opacity-40 blur-sm;
+  z-index: -1;
+}
 
 
 @layer utilities {

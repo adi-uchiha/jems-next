@@ -164,6 +164,24 @@ html {
   z-index: -1;
 }
 
+/* Dashboard Layout */
+.dashboard-layout {
+  @apply min-h-screen bg-background;
+}
+
+.dashboard-content {
+  @apply transition-all duration-300 ease-in-out;
+  margin-left: var(--sidebar-width);
+}
+
+/* Sidebar transitions */
+.sidebar-transition {
+  transition: width 0.3s ease-in-out;
+}
+
+.content-transition {
+  transition: margin-left 0.3s ease-in-out;
+}
 
 @layer utilities {
   /* Float animation */

@@ -7,14 +7,11 @@ import { headers } from "next/headers";
 import {promptTemplate} from "./prompt"
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export const maxDuration = 30; //Because This request take 15-20 seconds to process
-
 const resumePrompt = promptTemplate;
 
 export async function POST(req: Request) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers(),
     });

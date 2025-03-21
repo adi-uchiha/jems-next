@@ -36,5 +36,5 @@ interface ResumeOutput {
 	technical_skills: string[]; // Array of technical skills.  Extract ALL.
 	certifications_and_achievements: string[]; // Array of certifications and achievements. Extract ALL.
 }
-	
+
 Return me the JSON Oject only and No text outside the JSON object.`

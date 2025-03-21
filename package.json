@@ -13,6 +13,8 @@
     "db:generate": "tsx scripts/generate-migration.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.1.27",
+    "@ai-sdk/react": "^1.1.25",
     "@better-fetch/fetch": "1.1.12",
     "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.1",
@@ -51,6 +53,7 @@
     "@tanstack/react-query": "^5.62.3",
     "@types/better-sqlite3": "^7.6.12",
     "@uploadthing/react": "^7.3.0",
+    "ai": "^4.1.66",
     "better-auth": "^1.1.17",
     "better-call": "0.2.3-beta.2",
     "better-sqlite3": "^11.6.0",
@@ -73,7 +76,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.0",
-    "react-markdown": "^10.0.0",
+    "react-markdown": "^10.1.0",
     "react-qr-code": "^2.0.15",
     "react-resizable-panels": "^2.1.7",
     "recharts": "^2.14.1",
@@ -86,7 +89,7 @@
     "ua-parser-js": "^0.7.39",
     "uploadthing": "^7.5.2",
     "vaul": "^0.9.9",
-    "zod": "^3.23.8"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^20.17.9",

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Changed to Next.js router
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScraperForm } from "@/components/ScraperForm";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Job } from "@/components/JobList";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface ScraperProps {
   className?: string;
@@ -16,7 +17,7 @@ let isScrapingActive = false;
 
 export function JobScraper({ className, style }: ScraperProps) {
   const [status, setStatus] = useState<"idle" | "scraping" | "success" | "error">("idle");
-  const navigate = useNavigate();
+  const router = useRouter(); // Changed to Next.js router
 
   const handleSubmit = (values: any) => {
     if (isScrapingActive) {
@@ -36,7 +37,7 @@ export function JobScraper({ className, style }: ScraperProps) {
       
       // Generate the jobs and store in localStorage
       const scrapedJobs = generateMockJobs(values);
-      const sessionId = `session-${Date.now()}`;
+      const sessionId = `${Date.now()}`;
       
       // Store session data
       const sessionData = {
@@ -56,24 +57,50 @@ export function JobScraper({ className, style }: ScraperProps) {
       localStorage.setItem(sessionId, JSON.stringify(sessionData));
       
       // Navigate to results page with session ID
-      navigate(`/results/${sessionId}`);
+      router.push(`/dashboard/scraper/results/${sessionId}`);
     }, 3000);
   };
 
   return (
-    <div className={className} style={style}>
-      <Card className="overflow-hidden border-border/40 shadow-lg transition-all duration-300 glass-light dark:neo-blur">
-        <CardHeader className="pb-4">
+    <div className={cn(
+      "w-full max-w-3xl mx-auto",
+      className
+    )} style={style}>
+      <Card className={cn(
+        "overflow-hidden",
+        "border-border/50 dark:border-border/30",
+        "bg-card/50 dark:bg-card/40",
+        "backdrop-blur-sm",
+        "shadow-sm hover:shadow-md dark:shadow-none",
+        "transition-all duration-300"
+      )}>
+        <CardHeader className="pb-4 space-y-1">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-medium">Job Scraper</CardTitle>
-              <CardDescription className="mt-1">Search and scrape job listings</CardDescription>
+            <div className="space-y-1">
+              <CardTitle className={cn(
+                "text-2xl font-semibold tracking-tight",
+                "text-foreground dark:text-foreground"
+              )}>
+                Job Scraper
+              </CardTitle>
+              <CardDescription className={cn(
+                "text-sm text-muted-foreground",
+                "dark:text-muted-foreground"
+              )}>
+                Search and scrape job listings
+              </CardDescription>
             </div>
             <StatusBadge status={status} />
           </div>
         </CardHeader>
-        <CardContent className="pb-6">
-          <ScraperForm onSubmit={handleSubmit} isLoading={status === "scraping"} />
+        <CardContent className={cn(
+          "pb-6",
+          "border-border/50 dark:border-border/30"
+        )}>
+          <ScraperForm 
+            onSubmit={handleSubmit} 
+            isLoading={status === "scraping"} 
+          />
         </CardContent>
       </Card>
     </div>

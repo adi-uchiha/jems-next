@@ -10,8 +10,9 @@ import { Badge } from "@/components/Badge";
 import { JobCard } from "@/components/JobCard";
 // import Navbar from "@/components/Navbar";
 import { jobs } from "@/data/jobs";
+import { cn } from "@/lib/utils";
 
-const Index = () => {
+const AllJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [salaryRange, setSalaryRange] = useState([0, 200]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -38,102 +39,52 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* <Navbar /> */}
-      
       {/* Hero section */}
       <div className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background dark:from-primary/10 dark:via-background/50 dark:to-background" />
         <div className="absolute inset-0 bg-grid-small-white/[0.015] dark:bg-grid-small-white/[0.025]" />
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center mb-12 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Find Your Perfect Job
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Discover opportunities from top companies across multiple platforms
-            </p>
-            
-            <div className="bg-card/50 dark:bg-card/30 p-2 rounded-xl shadow-sm border border-border/50 backdrop-blur-sm max-w-3xl mx-auto animate-slide-up">
-              <div className="flex flex-col md:flex-row gap-2">
-                <div className="relative flex-grow">
-                  <Input
-                    type="text"
-                    placeholder="Job title, company, or keywords"
-                    className="h-12 pl-4 pr-10 border-gray-200"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="relative md:w-48">
-                  <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                  <Select>
-                    <SelectTrigger className="h-12 pl-10 border-gray-200">
-                      <SelectValue placeholder="Location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="anywhere">Anywhere</SelectItem>
-                      <SelectItem value="remote">Remote</SelectItem>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="europe">Europe</SelectItem>
-                      <SelectItem value="asia">Asia</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button className="h-12 px-8 bg-blue-600 hover:bg-blue-700">
-                  Search
-                </Button>
+          <div className="glass-panel max-w-3xl mx-auto animate-slide-up">
+            <div className="flex flex-col md:flex-row gap-2">
+              <div className="relative flex-grow">
+                <Input
+                  type="text"
+                  placeholder="Job title, company, or keywords"
+                  className="h-12 pl-4 pr-10 border-gray-200"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-            </div>
-            
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              <Badge 
-                text="Remote" 
-                variant="filled" 
-                color="success" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
-              <Badge 
-                text="Full-time" 
-                variant="filled" 
-                color="info" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
-              <Badge 
-                text="Contract" 
-                variant="filled" 
-                color="warning" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
-              <Badge 
-                text="Engineering" 
-                variant="outline" 
-                color="default" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
-              <Badge 
-                text="Design" 
-                variant="outline" 
-                color="default" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
-              <Badge 
-                text="Marketing" 
-                variant="outline" 
-                color="default" 
-                className="cursor-pointer hover:scale-105 transition-transform" 
-              />
+              <div className="relative md:w-48">
+                <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                <Select>
+                  <SelectTrigger className="h-12 pl-10 border-gray-200">
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="anywhere">Anywhere</SelectItem>
+                    <SelectItem value="remote">Remote</SelectItem>
+                    <SelectItem value="us">United States</SelectItem>
+                    <SelectItem value="europe">Europe</SelectItem>
+                    <SelectItem value="asia">Asia</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button className="h-12 px-8 bg-blue-600 hover:bg-blue-700">
+                Search
+              </Button>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Main content */}
       <div className="container mx-auto px-4 pb-16">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filters sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50 p-5 sticky top-20">
+            <div className="glass-panel p-5 sticky top-20">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-medium text-gray-900 flex items-center">
                   <Filter className="h-4 w-4 mr-2" />
@@ -274,16 +225,16 @@ const Index = () => {
                 
                 <Separator />
                 
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                   Apply Filters
                 </Button>
               </div>
             </div>
           </div>
-          
+
           {/* Job listings */}
           <div className="flex-1">
-            <div className="bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50 p-5 mb-6">
+            <div className="glass-panel p-5 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <Badge 
@@ -332,30 +283,33 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            
+
             {filteredJobs.length > 0 ? (
               <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
                 {filteredJobs.map((job) => (
                   <JobCard 
                     key={job.id} 
                     job={job} 
-                    className={animatedJobs.includes(job.id) ? "animate-scale-in" : "opacity-0"}
+                    className={cn(
+                      animatedJobs.includes(job.id) ? "animate-scale-in" : "opacity-0",
+                      "card-hover-effect"
+                    )}
                   />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50">
+              <div className="glass-panel py-16 text-center">
                 <p className="text-muted-foreground">No jobs found matching your criteria.</p>
                 <Button 
                   variant="link" 
-                  className="mt-2"
+                  className="mt-2 text-primary hover:text-primary/80"
                   onClick={() => setSearchTerm('')}
                 >
                   Clear filters
                 </Button>
               </div>
             )}
-            
+
             {/* Pagination placeholder */}
             {filteredJobs.length > 0 && (
               <div className="flex justify-center mt-8">
@@ -391,4 +345,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default AllJobsPage;

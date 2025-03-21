@@ -249,6 +249,31 @@ html {
       transform: translateY(0);
     }
   }
+
+  .animate-in {
+    animation: animate-in 0.5s ease-out;
+  }
+
+  .fade-in {
+    opacity: 0;
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }
 
 #root {
@@ -478,4 +503,26 @@ html {
 
 .dark .card-border:hover {
   box-shadow: 0 0 0 1px hsl(var(--border-strong) / 0.5);
+}
+
+/* Add to your existing styles */
+
+.gradient-text {
+  @apply bg-gradient-to-r from-primary/80 to-primary dark:from-primary dark:to-primary/80;
+  @apply bg-clip-text text-transparent;
+}
+
+.glass-panel {
+  @apply bg-card/50 dark:bg-card/40;
+  @apply backdrop-blur-sm;
+  @apply border border-border/50 dark:border-border/30;
+  @apply rounded-lg;
+  @apply transition-all duration-300;
+}
+
+.glass-header {
+  @apply backdrop-blur-lg;
+  @apply bg-background/80 dark:bg-background/80;
+  @apply border-border/40;
+  @apply transition-colors duration-300;
 }

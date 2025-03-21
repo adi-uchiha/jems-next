@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Heart, Share2, BookmarkPlus, ExternalLink, Building, MapPin, DollarSign, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/Badge";
 import { Tag } from "@/components/Tag";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface JobDetailHeaderProps {
   job: {
@@ -57,11 +56,22 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div className={cn(
+      "rounded-lg border border-border/50",
+      "bg-card/50 backdrop-blur-sm",
+      "dark:border-border/30 dark:bg-card/40",
+      "overflow-hidden"
+    )}>
       <div className="p-6 sm:p-8">
+        {/* Main content */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          {/* Company logo and info */}
           <div className="flex items-start space-x-4">
-            <div className="relative flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+            <div className={cn(
+              "relative flex-shrink-0 w-16 h-16",
+              "rounded-lg overflow-hidden",
+              "bg-muted/50 dark:bg-muted/30"
+            )}>
               <img
                 src={job.logo}
                 alt={`${job.company} logo`}
@@ -69,9 +79,12 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
                 loading="lazy"
               />
             </div>
+            
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl font-semibold text-gray-900">{job.title}</h1>
+                <h1 className="text-xl font-semibold text-foreground">
+                  {job.title}
+                </h1>
                 {job.isNew && (
                   <Badge
                     text="New"
@@ -87,8 +100,11 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
                   />
                 )}
               </div>
-              <p className="text-gray-700">{job.company}</p>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+              
+              <p className="text-muted-foreground">{job.company}</p>
+              
+              {/* Job details */}
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Building className="h-4 w-4" />
                   <span>{job.company}</span>
@@ -109,6 +125,7 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex flex-col sm:items-end space-y-3">
             <div className="flex items-center space-x-2">
               <div className="flex items-center text-xs text-gray-500">
@@ -168,7 +185,7 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
             <div className="flex flex-wrap gap-2">
               <Button
                 onClick={handleApply}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Apply Now
               </Button>
@@ -183,6 +200,7 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
           </div>
         </div>
 
+        {/* Tags */}
         <div className="mt-6 flex flex-wrap gap-2">
           {job.tags.map((tag) => (
             <Tag

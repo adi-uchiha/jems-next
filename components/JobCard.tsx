@@ -80,18 +80,25 @@ export const JobCard = ({ job, className }: JobCardProps) => {
   };
 
   return (
-    <Link href={`/job/${job.id}`} className="block">
+    <Link href={`/dashboard/all-jobs/job-details/${job.id}`} className="block">
       <div
         className={cn(
-          "bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-300",
+          "glass-panel",
           "hover:shadow-lg hover:-translate-y-1",
           "relative card-hover-effect",
+          "dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]",
           className
         )}
       >
         {job.isFeatured && (
           <div className="absolute top-0 right-0">
-            <Badge variant="secondary" className="rounded-bl-md rounded-tr-md">
+            <Badge 
+              variant="secondary" 
+              className={cn(
+                "rounded-bl-md rounded-tr-md",
+                "bg-primary/20 text-primary dark:bg-primary/30"
+              )}
+            >
               Featured
             </Badge>
           </div>
@@ -176,7 +183,7 @@ export const JobCard = ({ job, className }: JobCardProps) => {
                       size="icon"
                       className={cn(
                         "h-8 w-8 rounded-full",
-                        isLiked && "text-green-600 bg-green-50"
+                        isLiked && "text-primary bg-primary/10 dark:bg-primary/20"
                       )}
                       onClick={handleLike}
                     >

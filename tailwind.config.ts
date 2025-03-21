@@ -73,6 +73,12 @@ const config: Config = {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				gradient: {
+					start: "hsl(var(--primary) / 0.8)",
+					end: "hsl(var(--primary))",
+					'start-dark': "hsl(var(--primary))",
+					'end-dark': "hsl(var(--primary) / 0.8)"
 				}
 			},
 			borderRadius: {

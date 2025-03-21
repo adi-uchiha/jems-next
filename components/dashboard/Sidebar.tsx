@@ -14,10 +14,8 @@ import {
   User, 
   ChevronLeft, 
   ChevronRight,
-  FileSpreadsheet,
-  BarChart,
-  CalendarDays,
-  HelpCircle
+  HelpCircle,
+  Search
 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 
@@ -29,10 +27,10 @@ const menuItems = [
     badge: null
   },
   { 
-    title: 'My Jobs', 
+    title: 'All Jobs', 
     icon: Briefcase, 
-    href: '/dashboard/jobs',
-    badge: '12'
+    href: '/dashboard/all-jobs',
+    badge: null
   },
   { 
     title: 'Chat Assistant', 
@@ -41,21 +39,9 @@ const menuItems = [
     badge: 'New'
   },
   { 
-    title: 'Applications', 
-    icon: FileSpreadsheet, 
-    href: '/dashboard/applications',
-    badge: null
-  },
-  { 
-    title: 'Analytics', 
-    icon: BarChart, 
-    href: '/dashboard/analytics',
-    badge: null
-  },
-  { 
-    title: 'Calendar', 
-    icon: CalendarDays, 
-    href: '/dashboard/calendar',
+    title: 'Scraper', 
+    icon: Search, 
+    href: '/dashboard/scraper',
     badge: null
   },
   { 

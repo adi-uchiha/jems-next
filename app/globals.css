@@ -526,3 +526,44 @@ html {
   @apply border-border/40;
   @apply transition-colors duration-300;
 }
+
+/* Add these filter-specific styles */
+.filter-section {
+  @apply space-y-4 p-4;
+  @apply border border-border/50 rounded-lg;
+  @apply bg-card/50 backdrop-blur-sm;
+  @apply dark:bg-card/40 dark:border-border/30;
+}
+
+.filter-header {
+  @apply text-sm font-medium mb-2;
+  @apply text-foreground dark:text-foreground;
+}
+
+.filter-label {
+  @apply flex items-center text-sm;
+  @apply text-muted-foreground dark:text-muted-foreground;
+  @apply hover:text-foreground dark:hover:text-foreground;
+  @apply transition-colors duration-200;
+}
+
+.filter-group {
+  @apply space-y-2;
+}
+
+.filter-divider {
+  @apply my-4 border-t;
+  @apply border-border/50 dark:border-border/30;
+}
+
+.filter-range-value {
+  @apply text-xs font-medium;
+  @apply text-muted-foreground dark:text-muted-foreground;
+}
+
+.filter-badge {
+  @apply inline-flex items-center;
+  @apply px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-primary/10 text-primary;
+  @apply dark:bg-primary/20 dark:text-primary;
+}

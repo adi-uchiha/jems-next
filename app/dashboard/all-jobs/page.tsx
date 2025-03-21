@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
-import { Filter, MapPin, LayoutGrid, LayoutList, Clock } from "lucide-react";
+import { Filter, MapPin, LayoutGrid, LayoutList, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/Badge";
 import { JobCard } from "@/components/JobCard";
+import { Checkbox } from "@/components/ui/checkbox";
 // import Navbar from "@/components/Navbar";
 import { jobs } from "@/data/jobs";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,12 @@ const AllJobsPage = () => {
   const [salaryRange, setSalaryRange] = useState([0, 200]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [animatedJobs, setAnimatedJobs] = useState<string[]>([]);
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
+  const [selectedExperience, setSelectedExperience] = useState<string[]>([]);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+  const jobTypes = ["Full-time", "Part-time", "Contract", "Remote"];
+  const experienceLevels = ["Entry Level", "Mid Level", "Senior Level"];
 
   // Simulate jobs loading with animation
   useEffect(() => {
@@ -36,6 +43,17 @@ const AllJobsPage = () => {
     job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const resetFilters = () => {
+    setSelectedJobTypes([]);
+    setSelectedExperience([]);
+    setSalaryRange([0, 200]);
+    setActiveFilters([]);
+  };
+
+  const removeFilter = (filter: string) => {
+    setActiveFilters(activeFilters.filter(f => f !== filter));
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,150 +102,85 @@ const AllJobsPage = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filters sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="glass-panel p-5 sticky top-20">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-medium text-gray-900 flex items-center">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-                </h2>
-                <Button variant="ghost" size="sm" className="text-sm text-gray-500 h-8 px-2">
-                  Reset
-                </Button>
+            <div className="filter-section sticky top-20">
+              <div className="filter-group">
+                <h3 className="filter-header">Job Type</h3>
+                {jobTypes.map((type) => (
+                  <label key={type} className="filter-label">
+                    <Checkbox
+                      checked={selectedJobTypes.includes(type)}
+                      onCheckedChange={(checked) => {
+                        // ...existing checkbox logic
+                      }}
+                      className="mr-2"
+                    />
+                    {type}
+                  </label>
+                ))}
               </div>
-              
-              <Separator className="my-4" />
-              
-              <div className="space-y-5">
-                {/* Job Type */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3">Job Type</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="fulltime" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="fulltime" className="ml-2 text-sm text-gray-700">Full-time</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="parttime" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="parttime" className="ml-2 text-sm text-gray-700">Part-time</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="contract" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="contract" className="ml-2 text-sm text-gray-700">Contract</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="remote" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="remote" className="ml-2 text-sm text-gray-700">Remote</label>
-                    </div>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                {/* Experience Level */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3">Experience Level</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="entry" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="entry" className="ml-2 text-sm text-gray-700">Entry Level</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="mid" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="mid" className="ml-2 text-sm text-gray-700">Mid Level</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="senior" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="senior" className="ml-2 text-sm text-gray-700">Senior Level</label>
-                    </div>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                {/* Salary Range */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium">Salary Range</h3>
-                    <span className="text-xs text-gray-500">
-                      ${salaryRange[0]}k - ${salaryRange[1]}k
-                    </span>
-                  </div>
+
+              <div className="filter-divider" />
+
+              <div className="filter-group">
+                <h3 className="filter-header">Salary Range</h3>
+                <div className="pt-2 px-1">
                   <Slider
-                    defaultValue={[0, 200]}
+                    min={0}
                     max={200}
-                    step={10}
+                    step={5}
                     value={salaryRange}
                     onValueChange={setSalaryRange}
-                    className="my-4"
+                    className="[&>.relative]:bg-primary/20 dark:[&>.relative]:bg-primary/30"
                   />
-                </div>
-                
-                <Separator />
-                
-                {/* Platform */}
-                <div>
-                  <h3 className="text-sm font-medium mb-3">Platform</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="linkedin" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="linkedin" className="ml-2 text-sm text-gray-700">LinkedIn</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="indeed" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="indeed" className="ml-2 text-sm text-gray-700">Indeed</label>
-                    </div>
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="glassdoor" 
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="glassdoor" className="ml-2 text-sm text-gray-700">Glassdoor</label>
-                    </div>
+                  <div className="flex justify-between mt-2">
+                    <span className="filter-range-value">${salaryRange[0]}k</span>
+                    <span className="filter-range-value">${salaryRange[1]}k</span>
                   </div>
                 </div>
-                
-                <Separator />
-                
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Apply Filters
+              </div>
+
+              <div className="filter-divider" />
+
+              <div className="filter-group">
+                <h3 className="filter-header">Experience Level</h3>
+                {experienceLevels.map((level) => (
+                  <label key={level} className="filter-label">
+                    <Checkbox
+                      checked={selectedExperience.includes(level)}
+                      onCheckedChange={(checked) => {
+                        // ...existing checkbox logic
+                      }}
+                      className="mr-2"
+                    />
+                    {level}
+                  </label>
+                ))}
+              </div>
+
+              <div className="filter-divider" />
+
+              <div className="flex justify-between items-center">
+                <span className="filter-header">Active Filters</span>
+                <Button 
+                  variant="link" 
+                  size="sm"
+                  onClick={resetFilters}
+                  className="text-primary hover:text-primary/90 dark:text-primary dark:hover:text-primary/90"
+                >
+                  Reset All
                 </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                {activeFilters.map((filter) => (
+                  <span key={filter} className="filter-badge">
+                    {filter}
+                    <X 
+                      className="ml-1 h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" 
+                      onClick={() => removeFilter(filter)}
+                    />
+                  </span>
+                ))}
               </div>
             </div>
           </div>

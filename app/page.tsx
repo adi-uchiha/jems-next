@@ -1,3 +1,4 @@
+import { Providers } from "@/components/providers";
 import Header from "@/components/layout/Header";
 import Hero from "@/components/ui/hero";
 import Partners from "@/components/ui/partners";
@@ -9,17 +10,19 @@ import Footer from "@/components/layout/Footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">
-        <Hero />
-        <Partners />
-        <Features />
-        <Process />
-        <Testimonials />
-        <Cta />
-      </main>
-      <Footer />
-    </div>
+    <Providers>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1">
+          <Hero />
+          <Partners />
+          <Features />
+          <Process />
+          <Testimonials />
+          <Cta />
+        </main>
+        <Footer />
+      </div>
+    </Providers>
   );
 }

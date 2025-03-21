@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { MoonIcon, SunIcon, MenuIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/auth-client";
 
 interface ListItemProps {
   href: string;
@@ -43,6 +44,7 @@ const ListItem = ({ className, children, title, href, ...props }: ListItemProps)
 );
 
 const Header = () => {
+  const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -140,7 +142,7 @@ const Header = () => {
           </NavigationMenu>
         </div>
 
-        {/* Right Section */}
+        {/* Right Section - Updated Authentication Buttons */}
         <div className="hidden md:flex items-center gap-4">
           <Button
             variant="outline"
@@ -156,12 +158,23 @@ const Header = () => {
             <span className="sr-only">Toggle theme</span>
           </Button>
 
-          <Button asChild>
-            <Link href="/login">Get Started</Link>
-          </Button>
+          {session ? (
+            <Button asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/sign-in">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/sign-up">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu Controls */}
+        {/* Mobile Menu Controls - Updated */}
         <div className="md:hidden flex items-center gap-4">
           <Button
             variant="outline"
@@ -192,7 +205,7 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Menu Dropdown - Updated */}
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-x-0 top-[65px] p-4 bg-background/80 backdrop-blur-md border-b border-border">
             <nav className="flex flex-col space-y-4">
@@ -210,9 +223,20 @@ const Header = () => {
               >
                 How It Works
               </Link>
-              <Button asChild className="w-full">
-                <Link href="/login">Get Started</Link>
-              </Button>
+              {session ? (
+                <Button asChild className="w-full">
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild className="w-full">
+                    <Link href="/sign-in">Login</Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link href="/sign-up">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         )}

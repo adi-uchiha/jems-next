@@ -7,7 +7,7 @@ const {
 	default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
 
-const config = {
+const config: Config = {
 	darkMode: ["class"],
 	content: [
 		"./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -30,6 +30,7 @@ const config = {
 					DEFAULT: "hsl(var(--border))",
 					light: "hsl(var(--border) / 0.6)",
 					dark: "hsl(var(--border) / 0.3)",
+					strong: "hsl(var(--border-strong))"
 				},
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",

@@ -95,35 +95,48 @@ export function Sidebar() {
       }}
     >
       <div className="flex flex-col h-full">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className={cn(
-            "self-end text-muted-foreground hover:text-foreground",
-            isCollapsed ? "mx-auto my-2" : "m-2"
-          )}
-          onClick={toggleSidebar}
-        >
-          {isCollapsed ? 
-            <ChevronRight className="h-4 w-4" /> : 
-            <ChevronLeft className="h-4 w-4" />
-          }
-        </Button>
+        <div className={cn(
+          "flex items-center justify-center",
+          "h-10 my-2" // Consistent height with menu items
+        )}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={toggleSidebar}
+            className={cn(
+              "text-primary hover:text-primary hover:bg-primary/10",
+              "h-8 w-8 p-0", // Fixed size for better centering
+              "flex items-center justify-center"
+            )}
+          >
+            {isCollapsed ? 
+              <ChevronRight className="h-4 w-4" /> : 
+              <ChevronLeft className="h-4 w-4" />
+            }
+          </Button>
+        </div>
         
-        <nav className="space-y-2 px-2 py-4">
+        <nav className="space-y-2 px-2">
           {menuItems.map((item) => (
             <Link 
               key={item.href} 
               href={item.href}
               className={cn(
-                "flex items-center h-10 gap-3 px-3 rounded-md transition-colors",
+                "flex items-center h-10 gap-3 rounded-md transition-colors",
+                // Center icon when collapsed
+                isCollapsed ? "justify-center px-0" : "px-3",
                 "hover:bg-accent/50 dark:hover:bg-accent/20",
                 pathname === item.href ? 
                   "bg-accent text-accent-foreground dark:bg-accent/30" : 
                   "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className="flex items-center justify-center w-4 h-4 flex-shrink-0">
+              <div className={cn(
+                "flex items-center justify-center",
+                // Adjust icon container size
+                isCollapsed ? "w-8 h-8" : "w-4 h-4",
+                "flex-shrink-0"
+              )}>
                 <item.icon className="w-4 h-4" />
               </div>
               

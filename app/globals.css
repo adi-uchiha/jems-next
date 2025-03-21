@@ -23,6 +23,7 @@
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
   --border: 240 5.9% 90%;
+  --border-strong: 240 5.9% 95%;
   --input: 240 5.9% 90%;
   --ring: 142.1 76.2% 36.3%;
   --radius: 0.75rem;
@@ -45,7 +46,8 @@
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --border: 12 6.5% 15.1%;
+  --border: 240 5.9% 30%;
+  --border-strong: 240 5.9% 40%;
   --input: 12 6.5% 15.1%;
   --ring: 24 5.7% 82.9%;
   --chart-1: 220 70% 50%;
@@ -152,9 +154,19 @@ html {
 /* Dashboard styles */
 .dashboard-card {
   @apply rounded-lg border bg-card/50 backdrop-blur-sm;
-  @apply border-border/60 hover:border-border/80;
-  @apply dark:bg-card/40 dark:border-border/30 dark:hover:border-border/50;
-  @apply shadow-sm dark:shadow-none;
+  @apply border-border/70 hover:border-border/90; /* Increased opacity for light mode */
+  @apply dark:bg-card/40 dark:border-border dark:hover:border-border-strong; /* Stronger borders in dark mode */
+  @apply shadow-sm hover:shadow-md dark:shadow-none dark:hover:shadow-none;
+  @apply transition-all duration-200;
+}
+
+/* Dashboard card styles */
+.dashboard-card {
+  @apply rounded-lg border bg-card/50 backdrop-blur-sm;
+  @apply border-border/70 hover:border-border/90;
+  @apply dark:bg-card/40;
+  @apply dark:border-border hover:dark:border-border-strong;
+  @apply shadow-sm hover:shadow-md dark:shadow-none;
   @apply transition-all duration-200;
 }
 
@@ -317,9 +329,9 @@ html {
   transition: all 0.3s ease;
   @apply transition-all duration-300;
   @apply hover:shadow-md hover:-translate-y-1;
-  @apply dark:hover:shadow-none dark:hover:border-border/40;
-  @apply hover:border-border/80 dark:hover:border-border/50;
-  @apply dark:hover:bg-card/50;
+  @apply hover:border-border/90;
+  @apply dark:hover:border-border-strong dark:hover:bg-card/50;
+  @apply dark:shadow-none dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]; /* Subtle glow effect */
 }
 
 .card-hover-effect:hover {
@@ -436,4 +448,34 @@ html {
 /* Update existing chart styles */
 .recharts-wrapper {
   @apply rounded-lg;
+}
+
+.card-border {
+  @apply border border-border/70 bg-card/50;
+  @apply dark:border-border dark:bg-card/40;
+  @apply hover:border-border/90 dark:hover:border-border-strong;
+  @apply transition-colors duration-200;
+}
+
+/* Card with border styles */
+.card-border {
+  @apply rounded-lg border bg-card/50;
+  @apply border-border/70 hover:border-border/90;
+  @apply dark:bg-card/40;
+  @apply dark:border-border hover:dark:border-border-strong;
+  @apply transition-all duration-200;
+}
+
+/* Optional: Add a subtle inner glow for dark mode */
+.dark .card-border {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Dark mode enhancements */
+.dark .card-border {
+  box-shadow: 0 0 0 1px hsl(var(--border-strong) / 0.3);
+}
+
+.dark .card-border:hover {
+  box-shadow: 0 0 0 1px hsl(var(--border-strong) / 0.5);
 }

@@ -1,5 +1,3 @@
-
-import { useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Hero from "@/components/ui/hero";
 import Partners from "@/components/ui/partners";
@@ -9,30 +7,11 @@ import Testimonials from "@/components/ui/testimonials";
 import Cta from "@/components/ui/cta";
 import Footer from "@/components/layout/Footer";
 
-const Index = () => {
-  useEffect(() => {
-    // Set page metadata
-    document.title = "JEMS - AI-Powered Job Finding Assistant";
-    
-    // Initialize analytics tracking (could be connected to a real analytics service)
-    console.log("Page view tracked: Home");
-    
-    // Implement error boundary
-    window.addEventListener("error", (event) => {
-      console.error("Global error caught:", event.error);
-      // This could send errors to a monitoring service
-    });
-    
-    return () => {
-      window.removeEventListener("error", () => {});
-    };
-  }, []);
-
+export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col antialiased">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      
-      <main>
+      <main className="flex-1">
         <Hero />
         <Partners />
         <Features />
@@ -40,10 +19,7 @@ const Index = () => {
         <Testimonials />
         <Cta />
       </main>
-      
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import Link from "next/link"; // Changed to Next.js Link
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -9,25 +11,49 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { MoonIcon, SunIcon, MenuIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MoonIcon, SunIcon } from "lucide-react";
+
+interface ListItemProps {
+  href: string;
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const ListItem = ({ className, children, title, href, ...props }: ListItemProps) => (
+  <li>
+    <NavigationMenuLink asChild>
+      <a
+        className={cn(
+          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+          className
+        )}
+        href={href}
+        {...props}
+      >
+        <div className="text-sm font-medium leading-none">{title}</div>
+        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          {children}
+        </p>
+      </a>
+    </NavigationMenuLink>
+  </li>
+);
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    // Check system preference on mount
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     }
@@ -49,18 +75,20 @@ const Header = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-white font-bold text-xl">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
             J
           </div>
-          <span className="text-xl font-bold">JEMS</span>
-        </div>
+          <span className="text-xl font-bold text-foreground">JEMS</span>
+        </Link>
 
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Features</NavigationMenuTrigger>
-              <NavigationMenuContent>
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Features</NavigationMenuTrigger>
+                <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 w-[400px] md:w-[500px] md:grid-cols-2">
                   <li className="row-span-3">
                     <NavigationMenuLink asChild>
@@ -86,11 +114,11 @@ const Header = () => {
                     No more duplicate listings or irrelevant positions.
                   </ListItem>
                 </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>How It Works</NavigationMenuTrigger>
-              <NavigationMenuContent>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>How It Works</NavigationMenuTrigger>
+                <NavigationMenuContent>
                 <ul className="grid gap-3 p-6 w-[400px]">
                   <ListItem href="#process" title="Step 1: Upload Resume" className="">
                     Share your skills and experience with JEMS.
@@ -102,76 +130,87 @@ const Header = () => {
                     Receive personalized job recommendations.
                   </ListItem>
                 </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                className="px-4 py-2 inline-flex items-center justify-center"
-                href="#testimonials"
-              >
-                Testimonials
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                className="px-4 py-2 inline-flex items-center justify-center"
-                href="#cta"
-              >
-                Pricing
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link 
-                href="/dashboard"
-                className="px-4 py-2 inline-flex items-center justify-center"
-              >
-                Dashboard
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-            {isDark ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            {isDark ? (
+              <SunIcon className="h-4 w-4" />
+            ) : (
+              <MoonIcon className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle theme</span>
           </Button>
-          <Button variant="ghost" className="text-sm hidden sm:inline-flex">
-            Login
-          </Button>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-            Sign Up Free
+
+          <Button asChild>
+            <Link href="/login">Get Started</Link>
           </Button>
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            {isDark ? (
+              <SunIcon className="h-4 w-4" />
+            ) : (
+              <MoonIcon className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="h-9 w-9"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <MenuIcon className="h-5 w-5" />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-x-0 top-[65px] p-4 bg-background/80 backdrop-blur-md border-b border-border">
+            <nav className="flex flex-col space-y-4">
+              <Link
+                href="#features"
+                className="text-sm font-medium hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link
+                href="#process"
+                className="text-sm font-medium hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                How It Works
+              </Link>
+              <Button asChild className="w-full">
+                <Link href="/login">Get Started</Link>
+              </Button>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
-  );
-};
-
-interface ListItemProps {
-  className?: string;
-  title: string;
-  children: React.ReactNode;
-  [key: string]: any;
-}
-
-const ListItem = ({ className, title, children, ...props }: ListItemProps) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
   );
 };
 

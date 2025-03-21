@@ -1,4 +1,4 @@
-
+'use client'
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -55,16 +55,16 @@ const Hero = () => {
   return (
     <section 
       ref={heroRef}
-      className="min-h-screen relative overflow-hidden pt-28 pb-20 flex items-center"
+      className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-20 flex items-center"
     >
-      {/* Background gradient mesh */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-slate-50 to-blue-50 dark:from-slate-950 dark:via-blue-950/30 dark:to-slate-950" />
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-background" />
       
       {/* Animated background elements */}
-      <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-20 right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
       
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="inline-flex items-center px-3 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium">
@@ -79,7 +79,7 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary text-white hover:bg-primary/90 transition-all group">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Get Started Now
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -90,10 +90,10 @@ const Hero = () => {
             
             <div className="mt-12 flex items-center gap-6">
               <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">A</div>
-                <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs">B</div>
-                <div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs">C</div>
-                <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs">D</div>
+                <div className="w-8 h-8 rounded-full bg-primary/80 flex items-center justify-center text-primary-foreground text-xs">A</div>
+                <div className="w-8 h-8 rounded-full bg-primary/60 flex items-center justify-center text-primary-foreground text-xs">B</div>
+                <div className="w-8 h-8 rounded-full bg-primary/40 flex items-center justify-center text-primary-foreground text-xs">C</div>
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-foreground text-xs">D</div>
               </div>
               <p className="text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">10,000+</span> professionals found jobs last month
@@ -102,41 +102,41 @@ const Hero = () => {
           </div>
           
           <div className={`transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Card className="overflow-hidden border border-border/40 dark:border-border/20 bg-background/50 dark:bg-background/10 backdrop-blur-sm shadow-xl relative">
-              <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 pointer-events-none" />
+            <Card className="overflow-hidden border-border/40 bg-card/50 backdrop-blur-sm shadow-xl relative">
+              <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary/5 to-primary/2 pointer-events-none" />
               
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 rounded-full bg-primary/10">
                     <Search className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold">AI Job Assistant</h3>
+                  <h3 className="text-xl font-semibold text-foreground">AI Job Assistant</h3>
                 </div>
                 
                 <div className="space-y-4 mb-6">
-                  <div className="bg-background dark:bg-background/20 p-4 rounded-lg">
+                  <div className="bg-background/80 p-4 rounded-lg border border-border/40">
                     <p className="text-sm text-muted-foreground mb-2">Chat with JEMS</p>
-                    <p className="font-medium">Find me remote software engineer jobs that match my resume</p>
+                    <p className="font-medium text-foreground">Find me remote software engineer jobs that match my resume</p>
                   </div>
                   
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/50 p-4 rounded-lg border border-border/40">
                     <div className="flex gap-2 mb-2">
                       <Briefcase className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-medium">Found 28 matches</p>
+                      <p className="text-sm font-medium text-foreground">Found 28 matches</p>
                     </div>
-                    <p className="text-sm mb-3">Here are the top 3 matches based on your skills:</p>
+                    <p className="text-sm mb-3 text-muted-foreground">Here are the top 3 matches based on your skills:</p>
                     
                     <ul className="space-y-2">
-                      <li className="text-sm p-2 bg-background dark:bg-background/40 rounded border border-border/40">
-                        <div className="font-medium">Senior Frontend Engineer</div>
+                      <li className="text-sm p-2 bg-background/80 rounded border border-border/40">
+                        <div className="font-medium text-foreground">Senior Frontend Engineer</div>
                         <div className="text-xs text-muted-foreground">TechCorp • Remote • $130-150K</div>
                       </li>
-                      <li className="text-sm p-2 bg-background dark:bg-background/40 rounded border border-border/40">
-                        <div className="font-medium">React Developer</div>
+                      <li className="text-sm p-2 bg-background/80 rounded border border-border/40">
+                        <div className="font-medium text-foreground">React Developer</div>
                         <div className="text-xs text-muted-foreground">StartupXYZ • Remote • $110-130K</div>
                       </li>
-                      <li className="text-sm p-2 bg-background dark:bg-background/40 rounded border border-border/40">
-                        <div className="font-medium">Full Stack Engineer</div>
+                      <li className="text-sm p-2 bg-background/80 rounded border border-border/40">
+                        <div className="font-medium text-foreground">Full Stack Engineer</div>
                         <div className="text-xs text-muted-foreground">InnovateCo • Remote • $120-140K</div>
                       </li>
                     </ul>

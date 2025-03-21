@@ -1,7 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* Import external styles */
 @import "@uploadthing/react/styles.css";
 
 /* Base styles and CSS variables */
@@ -68,6 +65,8 @@ body {
 html {
   scroll-behavior: smooth;
 }
+}
+
 
 .no-visible-scrollbar {
   scrollbar-width: none;
@@ -78,57 +77,58 @@ html {
 .no-visible-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.glass-effect {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dark .glass-effect {
-  background: rgba(20, 20, 30, 0.75);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(60, 60, 80, 0.2);
-}
-
-.section-padding {
-  padding: 5rem 1rem;
-}
-
-@media (min-width: 768px) {
-  .section-padding {
-    padding: 5rem 1.5rem;
+@layer utilities {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
-}
-
-@media (min-width: 1024px) {
-  .section-padding {
-    padding: 5rem 2rem;
+  
+  .dark .glass-effect {
+    background: rgba(20, 20, 30, 0.75);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(60, 60, 80, 0.2);
   }
-}
 
-.text-gradient {
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
-}
+  .section-padding {
+    padding: 5rem 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .section-padding {
+      padding: 5rem 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding: 5rem 2rem;
+    }
+  }
 
-/* 3D Card Flip Utilities */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.preserve-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+  }
+  
+  /* 3D Card Flip Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
 
   /* Marquee animation */
   .marquee {
@@ -171,7 +171,7 @@ html {
     @apply absolute -inset-px rounded-lg bg-gradient-to-r from-primary/50 to-primary/30 opacity-40 blur-sm;
     z-index: -1;
   }
-
+}
 
 @layer utilities {
   /* Float animation */

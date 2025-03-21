@@ -26,7 +26,11 @@ const config = {
 		},
 		extend: {
 			colors: {
-				border: "hsl(var(--border))",
+				border: {
+					DEFAULT: "hsl(var(--border))",
+					light: "hsl(var(--border) / 0.6)",
+					dark: "hsl(var(--border) / 0.3)",
+				},
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",
 				background: "hsl(var(--background))",
@@ -162,8 +166,15 @@ const config = {
 			},
 			backdropBlur: {
 				'xs': '2px'
-			}
-			
+			},
+			borderOpacity: {
+				'30': '0.3',
+				'40': '0.4',
+				'50': '0.5',
+				'60': '0.6',
+				'70': '0.7',
+				'80': '0.8',
+			},
 		},
 	},
 	plugins: [

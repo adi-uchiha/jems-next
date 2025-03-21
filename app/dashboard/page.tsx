@@ -115,8 +115,7 @@ const Dashboard = () => {
   return (
     <div className="p-6">
       {/* Dashboard content */}
-      <div className="border-b border-border/30 p-4 bg-black/50 backdrop-blur-sm sticky top-16 z-20 flex justify-between items-center">
-      </div>
+
       
       {/* Dashboard content */}
       <div className="p-6">
@@ -126,15 +125,24 @@ const Dashboard = () => {
             <SearchCheck className="mr-2 h-4 w-4" />
             Start New Scraping Session
           </Button>
-          <Button variant="outline" className="border-border/50 text-white hover:bg-white/10">
+          <Button 
+            variant="outline" 
+            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+          >
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Update Preferences
           </Button>
-          <Button variant="outline" className="border-border/50 text-white hover:bg-white/10">
+          <Button 
+            variant="outline" 
+            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+          >
             <CalendarDays className="mr-2 h-4 w-4" />
             View Calendar
           </Button>
-          <Button variant="outline" className="border-border/50 text-white hover:bg-white/10">
+          <Button 
+            variant="outline" 
+            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+          >
             <TrendingUp className="mr-2 h-4 w-4" />
             Job Market Trends
           </Button>
@@ -201,7 +209,11 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DashboardChart title="Jobs by Source" config={pieChartConfig}>
+          <DashboardChart 
+            title="Jobs by Source" 
+            config={pieChartConfig}
+            className="rounded-lg border border-border/50 dark:border-border/20 bg-card"
+          >
             <PieChart>
               <Pie
                 data={jobSourcesData}

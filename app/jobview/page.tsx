@@ -1,4 +1,4 @@
-
+'use client'
 import { useState, useEffect } from "react";
 import { Filter, MapPin, LayoutGrid, LayoutList, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/Badge";
 import { JobCard } from "@/components/JobCard";
-import Navbar from "@/components/Navbar";
+// import Navbar from "@/components/Navbar";
 import { jobs } from "@/data/jobs";
 
 const Index = () => {
@@ -37,24 +37,24 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="min-h-screen bg-background">
+      {/* <Navbar /> */}
       
       {/* Hero section */}
       <div className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 z-0"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZ2LTNoMnYzaC0yem0tNCAydjRoM3YtNGgtM3ptMC0yaDN2LTNoLTN2M3ptLTQgNHYyaDJ2LTJoLTJ6bTAtNGgydi0yaC0ydjJ6TTM0IDM2aC00djJoNHYtMnptLTYgMGgtMnYyaDJ2LTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background dark:from-primary/10 dark:via-background/50 dark:to-background" />
+        <div className="absolute inset-0 bg-grid-small-white/[0.015] dark:bg-grid-small-white/[0.025]" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-12 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Find Your Perfect Job
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-muted-foreground mb-8">
               Discover opportunities from top companies across multiple platforms
             </p>
             
-            <div className="bg-white p-2 rounded-xl shadow-lg max-w-3xl mx-auto animate-slide-up">
+            <div className="bg-card/50 dark:bg-card/30 p-2 rounded-xl shadow-sm border border-border/50 backdrop-blur-sm max-w-3xl mx-auto animate-slide-up">
               <div className="flex flex-col md:flex-row gap-2">
                 <div className="relative flex-grow">
                   <Input
@@ -87,12 +87,42 @@ const Index = () => {
             </div>
             
             <div className="flex flex-wrap justify-center gap-2 mt-6">
-              <Badge text="Remote" variant="outline" color="success" className="cursor-pointer hover:bg-green-50" />
-              <Badge text="Full-time" variant="outline" color="info" className="cursor-pointer hover:bg-blue-50" />
-              <Badge text="Contract" variant="outline" color="warning" className="cursor-pointer hover:bg-yellow-50" />
-              <Badge text="Engineering" variant="outline" color="default" className="cursor-pointer hover:bg-gray-100" />
-              <Badge text="Design" variant="outline" color="default" className="cursor-pointer hover:bg-gray-100" />
-              <Badge text="Marketing" variant="outline" color="default" className="cursor-pointer hover:bg-gray-100" />
+              <Badge 
+                text="Remote" 
+                variant="filled" 
+                color="success" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
+              <Badge 
+                text="Full-time" 
+                variant="filled" 
+                color="info" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
+              <Badge 
+                text="Contract" 
+                variant="filled" 
+                color="warning" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
+              <Badge 
+                text="Engineering" 
+                variant="outline" 
+                color="default" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
+              <Badge 
+                text="Design" 
+                variant="outline" 
+                color="default" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
+              <Badge 
+                text="Marketing" 
+                variant="outline" 
+                color="default" 
+                className="cursor-pointer hover:scale-105 transition-transform" 
+              />
             </div>
           </div>
         </div>
@@ -103,7 +133,7 @@ const Index = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filters sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 sticky top-20">
+            <div className="bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50 p-5 sticky top-20">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-medium text-gray-900 flex items-center">
                   <Filter className="h-4 w-4 mr-2" />
@@ -253,16 +283,18 @@ const Index = () => {
           
           {/* Job listings */}
           <div className="flex-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-5 mb-6">
+            <div className="bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50 p-5 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900">
-                    {filteredJobs.length} Jobs Available
-                  </h2>
-                  <p className="text-sm text-gray-500 flex items-center mt-1">
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    text={`${filteredJobs.length} Jobs`} 
+                    variant="filled" 
+                    color="info" 
+                  />
+                  <span className="text-sm text-muted-foreground flex items-center">
                     <Clock className="h-3.5 w-3.5 mr-1" />
                     Updated 2 hours ago
-                  </p>
+                  </span>
                 </div>
                 
                 <div className="flex items-center space-x-4">
@@ -312,8 +344,8 @@ const Index = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200/80">
-                <p className="text-gray-500">No jobs found matching your criteria.</p>
+              <div className="text-center py-16 bg-card/50 dark:bg-card/30 rounded-xl shadow-sm border border-border/50">
+                <p className="text-muted-foreground">No jobs found matching your criteria.</p>
                 <Button 
                   variant="link" 
                   className="mt-2"

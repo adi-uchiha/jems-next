@@ -1,4 +1,4 @@
-
+'use client'
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { JobScraper } from "@/components/JobScraper";

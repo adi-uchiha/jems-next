@@ -1,13 +1,12 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Heart, ExternalLink, BookmarkPlus, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/badge";
 import { Tag } from "@/components/Tag";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface JobCardProps {
   job: {
@@ -81,10 +80,10 @@ export const JobCard = ({ job, className }: JobCardProps) => {
   };
 
   return (
-    <Link to={`/job/${job.id}`}>
+    <Link href={`/job/${job.id}`} className="block">
       <div
         className={cn(
-          "bg-white border border-gray-200/80 rounded-xl overflow-hidden transition-all duration-300",
+          "bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-300",
           "hover:shadow-lg hover:-translate-y-1",
           "relative card-hover-effect",
           className
@@ -92,19 +91,16 @@ export const JobCard = ({ job, className }: JobCardProps) => {
       >
         {job.isFeatured && (
           <div className="absolute top-0 right-0">
-            <Badge
-              text="Featured"
-              variant="filled"
-              color="warning"
-              className="rounded-bl-md rounded-tr-md"
-            />
+            <Badge variant="secondary" className="rounded-bl-md rounded-tr-md">
+              Featured
+            </Badge>
           </div>
         )}
         
         <div className="p-5">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-4">
-              <div className="relative flex-shrink-0 w-12 h-12 bg-gray-100 rounded-md overflow-hidden">
+              <div className="relative flex-shrink-0 w-12 h-12 bg-muted rounded-md overflow-hidden">
                 <img
                   src={job.logo}
                   alt={`${job.company} logo`}
@@ -114,13 +110,13 @@ export const JobCard = ({ job, className }: JobCardProps) => {
                 />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">{job.title}</h3>
-                <p className="text-sm text-gray-500 mt-0.5 flex items-center">
+                <h3 className="font-medium text-foreground">{job.title}</h3>
+                <p className="text-sm text-muted-foreground mt-0.5 flex items-center">
                   {job.company}
                   {job.isNew && (
-                    <span className="ml-2 text-xs font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">
+                    <Badge variant="default" className="ml-2">
                       New
-                    </span>
+                    </Badge>
                   )}
                 </p>
               </div>
@@ -164,13 +160,13 @@ export const JobCard = ({ job, className }: JobCardProps) => {
 
           <div className="mt-4 flex items-center justify-between text-sm">
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">{job.location}</span>
-              <span className="text-gray-700">{job.salary}</span>
+              <span className="text-foreground">{job.location}</span>
+              <span className="text-foreground">{job.salary}</span>
             </div>
-            <span className="text-gray-500">{job.postedDate}</span>
+            <span className="text-muted-foreground">{job.postedDate}</span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+          <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-4">
             <div className="flex items-center space-x-2">
               <TooltipProvider>
                 <Tooltip>
@@ -243,7 +239,7 @@ export const JobCard = ({ job, className }: JobCardProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-700 hover:text-gray-900"
+              className="text-muted-foreground hover:text-foreground"
               onClick={(e) => {
                 e.preventDefault();
                 window.open(`/job/${job.id}`, "_blank");

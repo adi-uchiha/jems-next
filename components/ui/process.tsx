@@ -1,5 +1,7 @@
 'use client'
+
 import { useRef, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -37,7 +39,7 @@ const Process = () => {
   const [progress, setProgress] = useState(0);
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
-  
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -72,78 +74,118 @@ const Process = () => {
   }, [isVisible]);
 
   return (
-    <section
+    <motion.section
       id="process"
       ref={sectionRef}
-      className="py-24 relative overflow-hidden bg-muted/30 dark:bg-slate-950/50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="py-24 relative overflow-hidden bg-background dark:bg-background/40"
     >
-      <div className="container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+      <div className="absolute inset-0 bg-grid-small-white/[0.015] dark:bg-grid-small-white/[0.025]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/50 to-background" />
+      
+      <div className="container mx-auto px-6 relative z-10">
+        <motion.div 
+          className="text-center max-w-2xl mx-auto mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-3xl font-bold tracking-tight mb-4">
-            How <span className="text-gradient">JEMS</span> Works
+            How <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">JEMS</span> Works
           </h2>
           <p className="text-muted-foreground text-lg">
             Your job hunt, reinvented with AI-powered simplicity and precision.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className={cn(
-            "transition-all duration-700",
-            isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-          )}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="space-y-6">
-              {steps.map((step, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex items-start gap-4 p-6 rounded-lg transition-all duration-300",
-                    activeStep === index
-                      ? "bg-background shadow-md border border-primary/20"
-                      : "opacity-70"
-                  )}
-                  onClick={() => {
-                    setActiveStep(index);
-                    setProgress((index / (steps.length - 1)) * 100);
-                  }}
-                >
-                  <div
+              <AnimatePresence mode="wait">
+                {steps.map((step, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ 
+                      opacity: activeStep === index ? 1 : 0.7,
+                      y: 0,
+                      scale: activeStep === index ? 1 : 0.98
+                    }}
+                    transition={{ 
+                      duration: 0.4,
+                      delay: index * 0.1,
+                      ease: "easeOut"
+                    }}
                     className={cn(
-                      "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                      activeStep === index
-                        ? "bg-primary/10"
-                        : "bg-muted"
+                      "flex items-start gap-4 p-6 rounded-lg cursor-pointer",
+                      "transition-all duration-300",
+                      activeStep === index ? 
+                        "bg-card shadow-lg border border-primary/20 dark:bg-card/40" : 
+                        "hover:bg-card/40"
                     )}
+                    onClick={() => {
+                      setActiveStep(index);
+                      setProgress((index / (steps.length - 1)) * 100);
+                    }}
                   >
-                    {step.icon}
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">{step.title}</h3>
-                    <p className="text-muted-foreground text-sm">{step.description}</p>
-                    
-                    <div
+                    <motion.div
                       className={cn(
-                        "mt-4 text-sm text-muted-foreground overflow-hidden transition-all",
-                        activeStep === index ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                        "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center",
+                        activeStep === index ? 
+                          "bg-primary/10 dark:bg-primary/20" : 
+                          "bg-muted/50"
                       )}
+                      whileHover={{ scale: 1.05 }}
                     >
-                      {step.detail}
+                      {step.icon}
+                    </motion.div>
+                    
+                    <div>
+                      <h3 className="text-lg font-semibold mb-1">{step.title}</h3>
+                      <p className="text-muted-foreground text-sm">{step.description}</p>
+                      
+                      <AnimatePresence>
+                        {activeStep === index && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-4 text-sm text-muted-foreground"
+                          >
+                            {step.detail}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
             
-            <div className="mt-8">
-              <Progress value={progress} className="h-2" />
-            </div>
-          </div>
+            <motion.div 
+              className="mt-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Progress 
+                value={progress} 
+                className="h-2 bg-muted/30"
+              />
+            </motion.div>
+          </motion.div>
           
-          <div className={cn(
-            "transition-all duration-700 delay-300",
-            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
-          )}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <Card className="overflow-hidden border border-border/40 bg-background/50 backdrop-blur-sm shadow-lg">
               <div className="p-1">
                 <div className="rounded-md overflow-hidden">
@@ -204,10 +246,10 @@ const Process = () => {
                 </div>
               </div>
             </Card>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

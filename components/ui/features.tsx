@@ -10,12 +10,12 @@ import {
   Filter, 
   Award
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const features = [
   {
-    icon: <Search className="h-10 w-10 mb-4 text-primary" />,
+    icon: <Search className="h-10 w-10 text-primary" />,
     title: "Smart Job Matching",
     description: "Our AI analyzes your resume and preferences to find jobs that perfectly match your skills and experience."
   },
@@ -83,50 +83,52 @@ const Features = () => {
     <section 
       id="features"
       ref={sectionRef} 
-      className="py-24 bg-gradient-to-b from-background to-muted/30 dark:from-background dark:to-background relative overflow-hidden"
+      className="py-24 relative overflow-hidden bg-background/50 dark:bg-background/40"
     >
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/50 to-background" />
       
-      <div className="container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
-            Intelligent Features for a <span className="text-gradient">Smarter Job Search</span>
+      <div className="container relative z-10 mx-auto px-4">
+        <div 
+          className={cn(
+            "text-center max-w-3xl mx-auto mb-16 transition-all duration-700 transform",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}
+        >
+          <h2 className="text-4xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+            Powered by AI, Built for You
           </h2>
-          <p className="text-muted-foreground text-lg">
-            JEMS combines cutting-edge AI with powerful job search tools to make finding your dream job faster and easier than ever.
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Experience the future of job searching with our advanced features
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
-            <div 
+            <Card
               key={index}
               className={cn(
-                "transition-all duration-700",
-                isVisible 
-                  ? "opacity-100 translate-y-0" 
-                  : "opacity-0 translate-y-10",
-                { "delay-100": index % 4 === 1 },
-                { "delay-200": index % 4 === 2 },
-                { "delay-300": index % 4 === 3 }
+                "group relative overflow-hidden border border-border/50",
+                "backdrop-blur-sm hover:shadow-lg transition-all duration-500",
+                "hover:scale-105 hover:bg-primary/5 hover:border-primary/20",
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+                `transition-all duration-700 delay-[${index * 100}ms]`
               )}
             >
-              <Card className="h-full border border-border/40 bg-background/50 backdrop-blur-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1">
-                <CardHeader>
-                  <div className="transition-transform duration-300 ease-in-out transform group-hover:scale-110">
-                    {feature.icon}
-                  </div>
-                  <CardTitle>{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-muted-foreground">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="relative z-10 p-6">
+                <div className="mb-4 transform group-hover:scale-110 transition-transform duration-500">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold mb-3 text-foreground">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </Card>
           ))}
         </div>
       </div>

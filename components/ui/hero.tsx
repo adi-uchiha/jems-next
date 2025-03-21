@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Search, Briefcase, Users } from "lucide-react";
 
 const TypeWriterText = ({ text, delay = 100 }) => {
@@ -33,11 +34,8 @@ const Hero = () => {
   
   useEffect(() => {
     setIsVisible(true);
-    
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
+      ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
     );
     
@@ -46,9 +44,7 @@ const Hero = () => {
     }
     
     return () => {
-      if (heroRef.current) {
-        observer.unobserve(heroRef.current);
-      }
+      if (heroRef.current) observer.unobserve(heroRef.current);
     };
   }, []);
 
@@ -57,28 +53,39 @@ const Hero = () => {
       ref={heroRef}
       className="min-h-[calc(100vh-4rem)] relative overflow-hidden py-20 flex items-center"
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-background" />
+      {/* Background with improved gradient */}
+      <div className="absolute inset-0 bg-background dark:bg-gradient-to-b dark:from-background dark:to-background/80" />
+      <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />
       
       {/* Animated background elements */}
       <div className="absolute top-20 right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-float delay-300" />
       
       <div className="container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="inline-flex items-center px-3 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
+          {/* Left Content */}
+          <div className={cn(
+            "transition-all duration-700",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
+            {/* Badge */}
+            <div className="inline-flex items-center px-3 py-1.5 mb-6 rounded-full bg-primary/10 text-primary text-sm font-medium animate-fade-in">
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
               AI-Powered Job Search
             </div>
             
-            <TypeWriterText text="Find Your Dream Job with JEMS" />
+            {/* Main heading with gradient */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              Find Your Dream Job with <span className="text-primary">JEMS</span>
+            </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-md">
+            {/* Description */}
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-md animate-fade-in opacity-0 delay-100">
               Upload your resume, set your preferences, and let our AI find the perfect job matches tailored to your skills and experience.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in opacity-0 delay-200">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Get Started Now
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -88,7 +95,8 @@ const Hero = () => {
               </Button>
             </div>
             
-            <div className="mt-12 flex items-center gap-6">
+            {/* Stats */}
+            <div className="mt-12 flex items-center gap-6 animate-fade-in opacity-0 delay-300">
               <div className="flex -space-x-2">
                 <div className="w-8 h-8 rounded-full bg-primary/80 flex items-center justify-center text-primary-foreground text-xs">A</div>
                 <div className="w-8 h-8 rounded-full bg-primary/60 flex items-center justify-center text-primary-foreground text-xs">B</div>
@@ -101,8 +109,12 @@ const Hero = () => {
             </div>
           </div>
           
-          <div className={`transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Card className="overflow-hidden border-border/40 bg-card/50 backdrop-blur-sm shadow-xl relative">
+          {/* Right Content - AI Chat Card */}
+          <div className={cn(
+            "transition-all duration-700 delay-300",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
+            <Card className="overflow-hidden border-border/40 bg-card/50 backdrop-blur-sm shadow-xl relative hover:shadow-2xl transition-all duration-300">
               <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary/5 to-primary/2 pointer-events-none" />
               
               <div className="p-6 md:p-8">

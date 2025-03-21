@@ -86,6 +86,7 @@ const Header = () => {
             height={40}
             className="object-contain"
           />
+          <div className="font-semibold">JEMS.</div>
         </Link>
 
         {/* Centered Navigation */}

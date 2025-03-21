@@ -92,50 +92,70 @@ const Testimonials = () => {
   const activeTestimonial = testimonials[activeIndex];
 
   return (
-    <section id="testimonials" className="section-padding bg-muted/50">
-      <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Users Say</h2>
-        <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Discover how JEMS has helped thousands of job seekers find their perfect position
-          with less time and stress.
-        </p>
+    <section id="testimonials" className="py-24 relative overflow-hidden">
+      {/* Add background effects */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/50 to-background" />
+      
+      <div className="container relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-4xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+            What Our Users Say
+          </h2>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Discover how JEMS has helped thousands of job seekers find their perfect position
+            with less time and stress.
+          </p>
+        </div>
 
-        <div className="relative">
+        <div className="relative px-4 sm:px-8">
           <div className="flex overflow-hidden">
             {testimonials.map((testimonial, index) => (
               <Card
                 key={testimonial.id}
                 className={cn(
                   "w-full shrink-0 transition-all duration-500 transform",
-                  index === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-95 absolute"
+                  "backdrop-blur-sm border-border/50 shadow-lg dark:shadow-primary/5",
+                  "hover:shadow-xl hover:border-primary/20 dark:hover:border-primary/30",
+                  index === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-95 absolute",
                 )}
               >
-                <CardContent className="pt-6">
-                  <div className="flex justify-center mb-4">
-                    <Avatar className="h-20 w-20 border-2 border-primary">
-                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                      <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                <CardContent className="pt-8 px-6">
+                  <div className="flex justify-center mb-6">
+                    <Avatar className="h-20 w-20 ring-2 ring-primary/20 dark:ring-primary/30">
+                      <AvatarImage 
+                        src={testimonial.avatar} 
+                        alt={testimonial.name}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-primary/5 text-primary">
+                        {testimonial.name.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                   </div>
 
-                  <div className="flex justify-center mb-4">
+                  <div className="flex justify-center mb-6">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={cn(
-                          "w-5 h-5",
-                          i < testimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                          "w-5 h-5 transition-all duration-300",
+                          i < testimonial.rating 
+                            ? "text-primary fill-primary" 
+                            : "text-muted-foreground/20"
                         )}
                       />
                     ))}
                   </div>
 
-                  <blockquote className="text-lg italic mb-6 max-w-2xl mx-auto">
+                  <blockquote className="text-lg text-foreground/90 italic mb-8 max-w-2xl mx-auto leading-relaxed">
                     "{testimonial.text}"
                   </blockquote>
 
-                  <div>
-                    <h4 className="font-semibold">{testimonial.name}</h4>
+                  <div className="space-y-1">
+                    <h4 className="font-semibold text-foreground">
+                      {testimonial.name}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       {testimonial.role} at {testimonial.company}
                     </p>
@@ -145,35 +165,48 @@ const Testimonials = () => {
             ))}
           </div>
 
-          <div className="flex justify-center mt-8 gap-2">
+          <div className="flex justify-center mt-8 gap-3">
             {testimonials.map((_, index) => (
-              <Star
+              <button
                 key={index}
-                className={cn(
-                  "h-3 w-3 cursor-pointer",
-                  activeIndex === index ? "text-primary fill-primary" : "text-muted-foreground"
-                )}
                 onClick={() => setActiveIndex(index)}
+                className={cn(
+                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                  activeIndex === index 
+                    ? "bg-primary scale-125" 
+                    : "bg-primary/20 hover:bg-primary/40"
+                )}
+                aria-label={`Go to testimonial ${index + 1}`}
               />
             ))}
           </div>
 
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 md:translate-x-0 bg-background/80 shadow-sm hover:bg-background"
+            className={cn(
+              "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2",
+              "bg-background/80 backdrop-blur-sm border-border/50",
+              "hover:bg-background hover:border-primary/20",
+              "shadow-lg dark:shadow-primary/5"
+            )}
             onClick={prevTestimonial}
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
 
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 md:translate-x-0 bg-background/80 shadow-sm hover:bg-background"
+            className={cn(
+              "absolute right-0 top-1/2 -translate-y-1/2 translate-x-2",
+              "bg-background/80 backdrop-blur-sm border-border/50",
+              "hover:bg-background hover:border-primary/20",
+              "shadow-lg dark:shadow-primary/5"
+            )}
             onClick={nextTestimonial}
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
       </div>

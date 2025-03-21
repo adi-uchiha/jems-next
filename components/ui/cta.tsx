@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,13 @@ const ConfettiExplosion = ({ onComplete }) => {
     
     if (!ctx) return;
     
-    const colors = ['#2563EB', '#22C55E', '#EC4899', '#EAB308', '#8B5CF6'];
+    const colors = [
+      'hsl(var(--primary))',
+      'hsl(var(--secondary))',
+      'hsl(var(--accent))',
+      'hsl(var(--muted))',
+      'hsl(var(--primary))'
+    ]; // Updated confetti colors to use theme variables
     
     const createParticles = () => {
       particles = [];
@@ -93,6 +100,12 @@ const ConfettiExplosion = ({ onComplete }) => {
   );
 };
 
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
 const Cta = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -130,86 +143,121 @@ const Cta = () => {
   };
 
   return (
-    <section
+    <motion.section
       id="cta"
       ref={sectionRef}
       className="py-24 relative overflow-hidden"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
     >
+      <div className="absolute inset-0 bg-gradient-to-b from-background to-background/80" />
+      
       <div className="container mx-auto px-6">
-        <div className={cn(
-          "transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        )}>
-          <Card className="border border-border/40 bg-background/50 backdrop-blur-sm overflow-hidden relative animate-float">
-            {/* Gradient border effect */}
-            <div className="absolute inset-0 p-[1px] rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-secondary/50 to-primary/50 animate-pulse" />
-            </div>
-            
+        <motion.div
+          variants={fadeInUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="border border-border/50 bg-background/50 backdrop-blur-sm">
             {showConfetti && <ConfettiExplosion onComplete={() => setShowConfetti(false)} />}
             
-            <CardContent className="p-8 md:p-12 relative">
+            <CardContent className="p-8 md:p-12">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                  <div className="flex items-center px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-medium inline-block mb-6">
-                    <span className="flex h-2 w-2 rounded-full bg-secondary mr-2"></span>
-                    Limited Time Offer
+                <motion.div
+                  variants={fadeInUp}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-secondary/10">
+                    <span className="text-sm font-medium text-secondary-foreground">
+                      Limited Time Offer
+                    </span>
                   </div>
                   
-                  <h2 className="text-3xl font-bold tracking-tight mb-6">
-                    Ready to Find Your <span className="text-gradient">Dream Job</span>?
-                  </h2>
+                  <motion.h2 
+                    className="text-3xl font-bold tracking-tight mb-6"
+                    variants={fadeInUp}
+                    transition={{ delay: 0.3 }}
+                  >
+                    Ready to Find Your{" "}
+                    <span className="text-primary">Dream Job</span>?
+                  </motion.h2>
                   
-                  <p className="text-muted-foreground text-lg mb-8">
-                    Join thousands of professionals who've already used JEMS to land their perfect position. Sign up now and get your first month free.
-                  </p>
+                  <motion.p 
+                    className="text-muted-foreground text-lg mb-8"
+                    variants={fadeInUp}
+                    transition={{ delay: 0.4 }}
+                  >
+                    Join thousands of professionals who've already used JEMS to land their perfect position.
+                  </motion.p>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                  <motion.div 
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8"
+                    variants={fadeInUp}
+                    transition={{ delay: 0.5 }}
+                  >
                     {[
                       "Resume analysis included",
                       "Unlimited job matches",
                       "AI Chat assistant",
                       "Real-time job alerts"
                     ].map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-secondary flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="w-1/3 h-2 rounded-full bg-secondary"></div>
-                      <div className="w-1/4 h-2 rounded-full bg-primary"></div>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="w-1/5 h-2 rounded-full bg-primary"></div>
-                      <div className="w-1/3 h-2 rounded-full bg-secondary"></div>
-                      <div className="w-1/6 h-2 rounded-full bg-primary"></div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-background/80 dark:bg-background/20 p-8 rounded-lg border border-border/40 backdrop-blur-sm">
-                  {isSubmitted ? (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="h-8 w-8 text-secondary" />
-                      </div>
-                      <h3 className="text-xl font-bold mb-2">You're All Set!</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Check your email for login details to start your job search journey with JEMS.
-                      </p>
-                      <Button
-                        onClick={() => setIsSubmitted(false)}
-                        variant="outline"
+                      <motion.div 
+                        key={index} 
+                        className="flex items-center gap-2"
+                        variants={fadeInUp}
+                        transition={{ delay: 0.2 * index }}
                       >
-                        Back to Form
-                      </Button>
-                    </div>
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                        <span className="text-sm">{feature}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </motion.div>
+                
+                <AnimatePresence mode="wait">
+                  {isSubmitted ? (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-card p-8 rounded-lg border border-border/50"
+                    >
+                      <motion.div 
+                        className="text-center"
+                        initial={{ y: 20 }}
+                        animate={{ y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <div className="mx-auto mb-6">
+                          <CheckCircle className="h-12 w-12 text-primary mx-auto" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">You're All Set!</h3>
+                        <p className="text-muted-foreground mb-6">
+                          Check your email for login details.
+                        </p>
+                        <Button
+                          onClick={() => setIsSubmitted(false)}
+                          variant="outline"
+                        >
+                          Back to Form
+                        </Button>
+                      </motion.div>
+                    </motion.div>
                   ) : (
-                    <>
+                    <motion.div
+                      key="form"
+                      variants={fadeInUp}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      className="bg-card p-8 rounded-lg border border-border/50"
+                    >
                       <h3 className="text-xl font-bold mb-4">Get Started Free</h3>
                       <p className="text-muted-foreground mb-6">
                         Join JEMS today and find your perfect job match. No credit card required.
@@ -258,15 +306,15 @@ const Cta = () => {
                       <p className="text-xs text-muted-foreground mt-6 text-center">
                         By signing up, you agree to our Terms of Service and Privacy Policy.
                       </p>
-                    </>
+                    </motion.div>
                   )}
-                </div>
+                </AnimatePresence>
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

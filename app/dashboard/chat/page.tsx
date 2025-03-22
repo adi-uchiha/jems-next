@@ -33,10 +33,12 @@ function ChatMessage({ message }: { message: Message }) {
       console.log("Text content:", textContent);
       console.log("Recommendations section:", recommendationsSection);
 
-      // Extract JSON from markdown code block
-      const jsonMatch = recommendationsSection.match(/```json\s*([\s\S]*?)\s*```/);
+      // Improved JSON extraction
+      const jsonMatch = recommendationsSection.match(/```json\s*([\s\S]*)$/); // Capture everything after ```json
       if (jsonMatch && jsonMatch[1]) {
-        const jsonString = jsonMatch[1].trim();
+        let jsonString = jsonMatch[1].trim();
+        // Remove closing ``` if present, or stop at end of string
+        jsonString = jsonString.replace(/```\s*$/, "").trim();
         console.log("Extracted JSON:", jsonString);
         jobs = JSON.parse(jsonString);
 
@@ -50,7 +52,21 @@ function ChatMessage({ message }: { message: Message }) {
         );
         console.log("Parsed jobs:", jobs);
       } else {
-        console.error("No valid JSON found in recommendations section:", recommendationsSection);
+        // Fallback: Try parsing the whole section as JSON if no ``` markers
+        const fallbackJson = recommendationsSection.trim();
+        if (fallbackJson.startsWith("[")) {
+          jobs = JSON.parse(fallbackJson);
+          jobs = jobs.filter(job => 
+            job.id && 
+            job.title && 
+            job.company && 
+            job.location && 
+            job.url
+          );
+          console.log("Fallback parsed jobs:", jobs);
+        } else {
+          console.error("No valid JSON found in recommendations section:", recommendationsSection);
+        }
       }
     } catch (e) {
       console.error("Failed to parse job recommendations:", e);

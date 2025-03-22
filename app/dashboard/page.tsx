@@ -152,28 +152,28 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <DashboardKpi
             title="Total Jobs Scraped"
-            value="1,234"
+            value="1,024"
             trend={5}
             icon={SearchCheck}
             className="bg-card/30 backdrop-blur-sm border-border/30"
           />
           <DashboardKpi
             title="Unique Jobs"
-            value="987"
+            value="887"
             trend={2}
             icon={FileSpreadsheet}
             className="bg-card/30 backdrop-blur-sm border-border/30"
           />
           <DashboardKpi
             title="Matching Jobs"
-            value="456"
+            value="416"
             trend={-3}
             icon={Briefcase}
             className="bg-card/30 backdrop-blur-sm border-border/30"
           />
           <DashboardKpi
             title="Applications"
-            value="12"
+            value="19"
             trend={15}
             icon={Activity}
             className="bg-card/30 backdrop-blur-sm border-border/30"

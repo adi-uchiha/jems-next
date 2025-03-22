@@ -21,7 +21,7 @@ const pinecone = new Pinecone({
 
 const INDEX_NAME = process.env.PINECONE_INDEX || "job-embeddings";
 
-export async function getPineconeContext(query: string, topK: number = 5, minScore: number = 0.3): Promise<string> {
+export async function getPineconeContext(query: string, topK: number = 15, minScore: number = 0.3): Promise<string> {
   try {
     // Generate embedding for the query
     const embedding = await getEmbedding(query);

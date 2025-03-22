@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BotIcon, UserIcon } from "lucide-react";
 import { JobRecommendations } from "./components/JobRecommendations";
+import { cn } from "@/lib/utils";
 
 // Simplified content extraction
 function getMessageContent(message: Message): string {
@@ -75,16 +76,16 @@ function ChatMessage({ message }: { message: Message }) {
 
   return (
     <motion.div
-      className="flex flex-col gap-4 px-4 w-full max-w-2xl first-of-type:pt-4"
+      className="flex flex-col gap-6 px-6 w-full max-w-4xl first-of-type:pt-4"
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
       <div className="flex gap-4">
-        <div className="size-[24px] border rounded-sm p-1 flex flex-col justify-center items-center shrink-0 text-zinc-500">
-          {message.role === "assistant" ? <BotIcon /> : <UserIcon />}
+        <div className="size-8 border rounded-lg p-1.5 flex flex-col justify-center items-center shrink-0 text-zinc-500">
+          {message.role === "assistant" ? <BotIcon className="w-5 h-5" /> : <UserIcon className="w-5 h-5" />}
         </div>
-        <div className="flex flex-col gap-2 w-full">
-          <div className="text-foreground dark:text-foreground/90">
+        <div className="flex flex-col gap-3 w-full">
+          <div className="text-foreground dark:text-foreground/90 text-base">
             {textContent ? (
               <Markdown>{textContent}</Markdown>
             ) : (
@@ -95,8 +96,8 @@ function ChatMessage({ message }: { message: Message }) {
       </div>
       
       {jobs.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">
+        <div className="mt-6">
+          <h3 className="text-base font-medium text-muted-foreground mb-4">
             Recommended Jobs
           </h3>
           <JobRecommendations jobs={jobs} />
@@ -141,31 +142,60 @@ export default function ChatInterface() {
     if (scrollAreaRef.current && messagesEndRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-    console.log("Current messages:", JSON.stringify(messages, null, 2));
   }, [messages]);
 
   return (
-    <main className="flex flex-col justify-center items-center min-h-screen p-4 bg-background">
-      <div className="flex flex-col h-[500px] w-full max-w-2xl border rounded-lg">
-        <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+    <main className="flex flex-col justify-center items-center min-h-[calc(100vh-4rem)] p-4 bg-background">
+      <div className={cn(
+        "flex flex-col w-full max-w-5xl",
+        "h-[80vh]",
+        "border rounded-lg overflow-hidden",
+        "bg-card/50 dark:bg-card/40",
+        "backdrop-blur-sm",
+        "border-border/50 dark:border-border/30",
+        "shadow-sm dark:shadow-none"
+      )}>
+        <ScrollArea 
+          ref={scrollAreaRef} 
+          className="flex-1 px-4 py-6"
+        >
           {messages.length === 0 && <ChatOverview />}
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
-          <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
+          <div ref={messagesEndRef} className="h-px" />
         </ScrollArea>
+
         <form
           onSubmit={handleSubmit}
-          className="p-4 border-t flex gap-2 relative items-end w-full"
+          className={cn(
+            "p-4 border-t flex gap-3 items-end",
+            "border-border/50 dark:border-border/30",
+            "bg-background/50 dark:bg-background/50",
+            "backdrop-blur-sm"
+          )}
         >
           <Input
             value={input}
             onChange={handleInputChange}
             placeholder="Type your message..."
             disabled={isLoading}
-            className="flex-1"
+            className={cn(
+              "flex-1",
+              "h-12",
+              "px-4",
+              "text-base",
+              "bg-card/50 dark:bg-card/40",
+              "border-border/50 dark:border-border/30",
+              "focus:ring-primary/20 dark:focus:ring-primary/30"
+            )}
           />
-          <Button type="submit" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            size="lg"
+            className="px-6"
+          >
             {isLoading ? "Sending..." : "Send"}
           </Button>
         </form>

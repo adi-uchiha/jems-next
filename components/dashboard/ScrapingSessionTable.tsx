@@ -16,7 +16,7 @@ interface Session {
 
 const sessions: Session[] = [
   {
-    id: "SS-1234",
+    id: "SS-174",
     startTime: "2023-10-01 09:30:45",
     endTime: "2023-10-01 09:45:12",
     status: "completed",
@@ -27,14 +27,14 @@ const sessions: Session[] = [
     startTime: "2023-10-02 14:22:10",
     endTime: "2023-10-02 14:40:05",
     status: "completed",
-    jobsScraped: 87,
+    jobsScraped: 81,
   },
   {
     id: "SS-1236",
     startTime: "2023-10-03 11:15:30",
     endTime: "",
     status: "in-progress",
-    jobsScraped: 45,
+    jobsScraped: 25,
   },
   {
     id: "SS-1237",

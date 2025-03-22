@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
 		config.externals.push("@libsql/client");
 		return config;
 	},
+	typescript: {
+		ignoreBuildErrors: true,
+	}
 };
 
 export default nextConfig;

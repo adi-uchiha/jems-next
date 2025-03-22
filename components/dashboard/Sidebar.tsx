@@ -15,7 +15,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   HelpCircle,
-  Search
+  Search,
+  Flame
 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 
@@ -24,6 +25,12 @@ const menuItems = [
     title: 'Dashboard', 
     icon: Activity, 
     href: '/dashboard',
+    badge: null
+  },
+  {
+  title: 'Onboarding',
+    icon: Flame,
+    href: '/dashboard/onboarding',
     badge: null
   },
   { 

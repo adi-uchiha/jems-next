@@ -136,7 +136,7 @@ export default function EditResumePage() {
       if (!response.ok) throw new Error("Failed to update resume")
       
       toast.success("Resume updated successfully")
-      router.push("/chat")
+      router.push("/dashboard")
     } catch (error) {
       console.error("Error updating resume:", error)
       toast.error("Failed to update resume")

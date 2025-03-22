@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -34,10 +35,19 @@ const pathNames = {
 export function DashboardNavbar() {
   const { isCollapsed } = useSidebar();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [notifications] = useState([
     { id: 1, title: 'New job match', description: '3 new jobs match your profile' },
     { id: 2, title: 'Application update', description: 'Interview scheduled for Frontend Role' }
   ]);
+
+  const userInitials = session?.user?.name
+    ? session.user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : 'U';
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 border-b border-border/50 bg-background/80 backdrop-blur-xl z-40 dark:bg-background/20 dark:border-border/20 pr-8 pl-4">
@@ -91,9 +101,13 @@ export function DashboardNavbar() {
         {/* Right section - Actions */}
         <div className="flex items-center gap-6"> {/* Increased gap */}
           {/* Welcome message */}
-          <span className="hidden xl:block text-sm">
-            Welcome back, <span className="font-semibold text-foreground">John Doe</span>
-          </span>
+          {session?.user && (
+            <span className="hidden xl:block text-sm">
+              Welcome back, <span className="font-semibold text-foreground">
+                {session.user.name}
+              </span>
+            </span>
+          )}
 
           <div className="h-6 w-px bg-border/50 dark:bg-border/40" />
           
@@ -147,23 +161,25 @@ export function DashboardNavbar() {
                   className="gap-3 px-3 h-10" // Adjusted padding and height
                 >
                   <Avatar className="h-8 w-8"> {/* Increased avatar size */}
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>UI</AvatarFallback>
+                    <AvatarImage src={session?.user?.image || undefined} />
+                    <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                   <span className="hidden md:inline-block font-medium">
-                    John Doe
+                    {session?.user?.name || 'Guest'}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-3 p-3 border-b border-border/50">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>UI</AvatarFallback>
+                    <AvatarImage src={session?.user?.image || undefined} />
+                    <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">{session?.user?.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {session?.user?.email}
+                    </p>
                   </div>
                 </div>
                 <DropdownMenuItem asChild>
@@ -179,7 +195,10 @@ export function DashboardNavbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                <DropdownMenuItem 
+                  onClick={handleSignOut}
+                  className="text-destructive focus:text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>

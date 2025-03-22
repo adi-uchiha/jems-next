@@ -161,7 +161,7 @@ export default function OnboardingPage() {
   return (
     <div className="container mx-auto py-6 md:py-12 px-4 space-y-8 md:space-y-12">
       <div className="text-center">
-        <h1 className="text-2xl md:text-3xl font-bold">Getting started</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Welcome to JEMS</h1>
         <p className="mt-2 text-sm text-muted-foreground">Find better jobs easily by uploading your resume</p>
       </div>
 

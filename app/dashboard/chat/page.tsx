@@ -1,46 +1,34 @@
-// components/chat-interface.tsx
 "use client";
 
-import { Message } from "ai";
-import { useChat } from "@ai-sdk/react";
+import { Message, useChat } from "ai/react"; // v4 import
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import Markdown from "react-markdown"; // Import react-markdown
-
+import Markdown from "react-markdown";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BotIcon, UserIcon } from "lucide-react"; // Assuming these exist
+import { BotIcon, UserIcon } from "lucide-react";
 
-// Parse raw streaming text from parts or content
+// Parse raw streaming text (unchanged)
 function parseRawText(rawText: string): string {
   const lines = rawText.split("\n");
   let textContent = "";
-
   for (const line of lines) {
     if (line.startsWith('0:"')) {
       const text = line.slice(3).replace(/\\n/g, "\n").replace(/\\"/g, '"');
       textContent += text.endsWith('"') ? text.slice(0, -1) : text;
     }
   }
-
   return textContent.trim();
 }
 
-// Render a single message
+// Render a single message (unchanged)
 function ChatMessage({ message }: { message: Message }) {
-  const content = message.parts?.length
-    ? message.parts.map((part) => {
-        if (part.type === "text") {
-          return parseRawText(part.text); // Parse raw text from parts
-        }
-        return ""; // Handle other part types if needed (e.g., tool-invocation)
-      }).join("")
-    : parseRawText(message.content); // Fallback to content if no parts
+  const content = message.content ? parseRawText(message.content) : "";
 
   return (
     <motion.div
-      className={`flex flex-row gap-4 px-4 w-full max-w-2xl first-of-type:pt-4`}
+      className="flex flex-row gap-4 px-4 w-full max-w-2xl first-of-type:pt-4"
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
@@ -56,7 +44,7 @@ function ChatMessage({ message }: { message: Message }) {
   );
 }
 
-// Empty state component
+// Empty state component (unchanged)
 function ChatOverview() {
   return (
     <motion.div
@@ -83,8 +71,7 @@ export default function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
-    streamProtocol: "text", // Matches your API setup
+    api: "/api/chat", // Only specify the API endpoint
   });
 
   // Auto-scroll to bottom when messages update

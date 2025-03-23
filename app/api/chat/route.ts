@@ -1,3 +1,4 @@
+//app/api/chat/route.ts
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { getPineconeContext } from "@/lib/pinecone";

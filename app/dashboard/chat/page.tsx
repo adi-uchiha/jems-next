@@ -22,7 +22,6 @@ function getMessageContent(message: Message): string {
 function ChatMessage({ message }: { message: Message }) {
   const content = getMessageContent(message);
   
-  // Extract job recommendations if present
   const hasRecommendations = content.includes("JOB_RECOMMENDATIONS:");
   let textContent = content;
   let jobs: { id: string; title: string; company: string; location: string; url: string }[] = [];
@@ -34,12 +33,10 @@ function ChatMessage({ message }: { message: Message }) {
       console.log("Text content:", textContent);
       console.log("Recommendations section:", recommendationsSection);
 
-      // Improved JSON extraction
-      const jsonMatch = recommendationsSection.match(/```json\s*([\s\S]*)$/); // Capture everything after ```json
+      // Extract JSON only if enclosed between ```json and ```
+      const jsonMatch = recommendationsSection.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonMatch && jsonMatch[1]) {
-        let jsonString = jsonMatch[1].trim();
-        // Remove closing ``` if present, or stop at end of string
-        jsonString = jsonString.replace(/```\s*$/, "").trim();
+        const jsonString = jsonMatch[1].trim();
         console.log("Extracted JSON:", jsonString);
         jobs = JSON.parse(jsonString);
 
@@ -53,21 +50,8 @@ function ChatMessage({ message }: { message: Message }) {
         );
         console.log("Parsed jobs:", jobs);
       } else {
-        // Fallback: Try parsing the whole section as JSON if no ``` markers
-        const fallbackJson = recommendationsSection.trim();
-        if (fallbackJson.startsWith("[")) {
-          jobs = JSON.parse(fallbackJson);
-          jobs = jobs.filter(job => 
-            job.id && 
-            job.title && 
-            job.company && 
-            job.location && 
-            job.url
-          );
-          console.log("Fallback parsed jobs:", jobs);
-        } else {
-          console.error("No valid JSON found in recommendations section:", recommendationsSection);
-        }
+        console.log("No complete JSON found yet in recommendations section.");
+        // Skip parsing; content is still streaming
       }
     } catch (e) {
       console.error("Failed to parse job recommendations:", e);

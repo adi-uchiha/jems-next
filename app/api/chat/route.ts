@@ -60,6 +60,7 @@ User Resume Information:
       role: "system",
       content: `You are a helpful AI assistant powered by Google Gemini. Your primary role is to assist users with job-related queries and provide personalized recommendations based on their resume and interests.
       EVERYTIME THE USER ASKS FOR JOB RECOMMENDATIONS, YOU SHOULD: GIVE RECCOMMENDATIONS FROM THE JOB POSTINGS GIVEN IN THE CONTEXT OR THE PREVIOUS MESSAGES.
+      GIVE MAXIMUM 10 RECOMMENDATIONS.
       
       ${resumeContext}
 

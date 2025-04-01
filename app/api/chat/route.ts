@@ -104,8 +104,13 @@ User Resume Information:
     });
     console.log("-----------------------------------------------------------------------------------")
     console.log("Called Gemini API");
-    console.log("-----------------------------------------------------------------------------------")
+
+    console.log("------------------------CONSOLELOG OF RESPONSE-----------------------------------------------------------")
     console.log(response)
+
+    console.log("------------------------------to dataStreamResponse--------------------------------------")
+    console.log(response.toDataStreamResponse())
+    
     return response.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);

@@ -1,3 +1,4 @@
+//app/api/chat/route.ts
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { getPineconeContext } from "@/lib/pinecone";
@@ -101,7 +102,10 @@ User Resume Information:
       temperature: 0.7,
       maxTokens: 1000,
     });
-
+    console.log("-----------------------------------------------------------------------------------")
+    console.log("Called Gemini API");
+    console.log("-----------------------------------------------------------------------------------")
+    console.log(response)
     return response.toDataStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);

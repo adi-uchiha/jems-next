@@ -1,3 +1,4 @@
+//lib/pinecone.ts
 import { Pinecone } from "@pinecone-database/pinecone";
 
 // Define metadata interface matching your Pinecone data

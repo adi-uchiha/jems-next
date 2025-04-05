@@ -2,6 +2,7 @@ import { db } from "@/lib/database/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { nanoid } from "nanoid";
+import { NewChat } from "@/lib/database/types";
 
 export async function GET() {
   try {
@@ -39,17 +40,27 @@ export async function POST(req: Request) {
 
     const { title } = await req.json();
     const chatId = nanoid();
+    const now = new Date().toISOString();
+
+    const newChat: NewChat = {
+      id: chatId,
+      user_id: session.user.id,
+      title,
+      created_at: now,
+      updated_at: now
+    };
 
     await db
       .insertInto('chats')
-      .values({
-        id: chatId,
-        user_id: session.user.id,
-        title,
-      })
+      .values(newChat)
       .execute();
 
-    return new Response(JSON.stringify({ id: chatId, title }));
+    return new Response(JSON.stringify({ 
+      id: chatId, 
+      title,
+      created_at: now,
+      updated_at: now 
+    }));
   } catch (error) {
     console.error('Error creating chat:', error);
     return new Response("Internal Server Error", { status: 500 });

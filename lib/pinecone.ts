@@ -37,69 +37,17 @@ export async function getPineconeContext(query: string, topK: number = 15, minSc
       includeMetadata: true,
     });
 
-    console.log("Query result:", JSON.stringify(queryResult, null, 2));
+    console.log("PINECONE QUERY RESULTS", JSON.stringify(queryResult, null, 2));
 
     // Ensure matches exist and log raw data
     const rawMatches = queryResult.matches || [];
-    console.log("Raw matches count:", rawMatches.length);
     if (rawMatches.length === 0) {
       return "No job matches found in Pinecone.";
     } else {
       return JSON.stringify(queryResult, null, 2);
     }
 
-    // Filter matches with explicit checks
-//     const filteredMatches = rawMatches
-//       .filter((match: PineconeMatch) => {
-//         const isValid =
-//           typeof match.score === "number" &&
-//           match.score > minScore &&
-//           match.metadata !== undefined &&
-//           typeof match.metadata === "object";
 
-//         console.log(`Filtering match ${match.id}:`, {
-//           score: match.score,
-//           hasMetadata: !!match.metadata,
-//           isValid,
-//         });
-
-//         return isValid;
-//       })
-//       .map((match: PineconeMatch) => {
-//         const metadata = match.metadata as JobMetadata;
-//         return {
-//           id: match.id,
-//           title: metadata.title || "Untitled Position",
-//           company: metadata.company || "Unknown Company",
-//           location: metadata.location || "Remote/Flexible",
-//           url: metadata.url || "#",
-//           score: match.score.toFixed(3),
-//         };
-//       });
-
-//     console.log("Filtered matches:", JSON.stringify(filteredMatches, null, 2));
-
-//     // Format jobs for LLM context
-//     if (filteredMatches.length > 0) {
-//       const formattedJobs = filteredMatches
-//         .map(
-//           (job) => `
-// Job ID: ${job.id}
-// Title: ${job.title}
-// Company: ${job.company}
-// Location: ${job.location}
-// Score: ${job.score}
-// URL: ${job.url}
-// ---`
-//         )
-//         .join("\n");
-
-//         console.log("Formatted jobs:", formattedJobs);
-
-//       return `Found ${filteredMatches.length} relevant jobs:\n${formattedJobs}\n\nJOB_DATA:${JSON.stringify(filteredMatches)}`;
-//     }
-
-//     return "No relevant jobs found.";
   } catch (error) {
     console.error("Error querying Pinecone:", error);
     return "Error fetching job recommendations.";

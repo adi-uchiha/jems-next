@@ -23,6 +23,22 @@ export interface ResumeTable {
     updatedAt: ColumnType<Date, string | Date, string | Date>;
 }
 
+export interface ChatTable {
+  id: string;
+  user_id: string;
+  title: string;
+  updated_at: ColumnType<Date, string | Date, string | Date>;
+  created_at: ColumnType<Date, string | Date, string | Date>;
+}
+
+export interface ChatMessageTable {
+  id: string;
+  chat_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  created_at: ColumnType<Date, string | Date, string | Date>;
+}
+
 // Combine all tables interface
 export interface Database {
     // // Existing tables from BetterAuth
@@ -41,6 +57,8 @@ export interface Database {
 
     // // Our custom tables
     resumes: ResumeTable;
+    chats: ChatTable;
+    chat_messages: ChatMessageTable;
 }
 
 // For GET operations - includes all fields
@@ -51,3 +69,13 @@ export type NewResume = Insertable<ResumeTable>;
 
 // For UPDATE operations - makes all fields optional
 export type ResumeUpdate = Updateable<ResumeTable>;
+
+// Chat types
+export type Chat = Selectable<ChatTable>;
+export type NewChat = Insertable<ChatTable>;
+export type ChatUpdate = Updateable<ChatTable>;
+
+// Chat message types
+export type ChatMessage = Selectable<ChatMessageTable>;
+export type NewChatMessage = Insertable<ChatMessageTable>;
+export type ChatMessageUpdate = Updateable<ChatMessageTable>;

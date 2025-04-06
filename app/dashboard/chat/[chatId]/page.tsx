@@ -16,13 +16,15 @@ export default function ChatPage() {
   const chatId = params?.chatId as string;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true); // State for initial load
+  const [lastMessageId, setLastMessageId] = useState<string | null>(null);
+  const [hasLoadedInitialMessages, setHasLoadedInitialMessages] = useState(false);
 
   // useChat Hook
   const {
     messages,
     input,
     handleInputChange,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
     isLoading, // This is for ongoing AI responses, not initial load
     error,     // Added error handling from useChat
     setMessages // Function to update messages state
@@ -45,17 +47,43 @@ export default function ChatPage() {
       }
       // Optionally show a user-friendly error message (e.g., using a toast library)
     },
-    // onFinish: (message) => {
-    //   console.log('Finished receiving message:', message);
-    // },
+    onFinish: (message) => {
+      setLastMessageId(message.id);
+      setTimeout(() => setLastMessageId(null), 1000);
+    },
+    onResponse: (response) => {
+      // Ensure we're not in loading state during streaming
+      setIsInitialLoading(false);
+    },
   });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    // Create optimistic user message
+    const optimisticId = Date.now().toString();
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      content: input,
+      role: 'user',
+      createdAt: new Date()
+    };
+
+    setLastMessageId(optimisticId);
+    setMessages([...messages, optimisticMessage]);
+    
+    // Call original submit
+    originalHandleSubmit(e);
+  };
 
   // Effect for Initial Verification and Loading
   useEffect(() => {
     let isMounted = true; // Prevent state updates if component unmounts
 
     const loadInitialData = async () => {
-      if (!chatId || !isMounted) return;
+      // Only load if we haven't loaded messages yet
+      if (!chatId || !isMounted || hasLoadedInitialMessages) return;
 
       console.log("Starting initial data load for chat:", chatId);
       setIsInitialLoading(true);
@@ -72,35 +100,31 @@ export default function ChatPage() {
         console.log("Chat verified.");
 
         // 2. Load initial messages only if messages array is currently empty
-        if (messages.length === 0) {
-          console.log("Loading initial messages...");
-          const messagesResponse = await fetch(`/api/chats/${chatId}/messages`); // Use GET for messages
-          if (!messagesResponse.ok) {
-            console.error("Failed to load messages, status:", messagesResponse.status);
-            // Handle appropriately - maybe show error, but don't necessarily redirect
-            // unless the error indicates lack of access (e.g., 401, 403, 404)
-             if (messagesResponse.status === 404 && isMounted) {
-                router.push('/dashboard/chat'); // Redirect if chat truly not found
-             }
-             throw new Error(`Failed to load messages: ${messagesResponse.statusText}`);
+        console.log("Loading initial messages...");
+        const messagesResponse = await fetch(`/api/chats/${chatId}/messages`); // Use GET for messages
+        if (!messagesResponse.ok) {
+          console.error("Failed to load messages, status:", messagesResponse.status);
+          // Handle appropriately - maybe show error, but don't necessarily redirect
+          // unless the error indicates lack of access (e.g., 401, 403, 404)
+          if (messagesResponse.status === 404 && isMounted) {
+            router.push('/dashboard/chat'); // Redirect if chat truly not found
           }
-
-          const initialMessages: Message[] = await messagesResponse.json();
-          console.log("Initial messages fetched:", initialMessages.length);
-          if (isMounted) {
-            setMessages(initialMessages); // Update useChat state
-             console.log("Messages set in useChat state.");
-          }
-        } else {
-           console.log("Messages already loaded, skipping fetch.");
+          throw new Error(`Failed to load messages: ${messagesResponse.statusText}`);
         }
 
+        const initialMessages: Message[] = await messagesResponse.json();
+        console.log("Initial messages fetched:", initialMessages.length);
+        if (isMounted) {
+          setMessages(initialMessages); // Update useChat state
+          setHasLoadedInitialMessages(true);
+          console.log("Messages set in useChat state.");
+        }
       } catch (err) {
         console.error('Error during initial data load:', err);
         if (isMounted) {
-           // Optionally show error to user
-           // Consider redirecting only on specific errors like 404 or auth issues
-           // router.push('/dashboard/chat'); // Reconsider redirecting on generic fetch errors
+          // Optionally show error to user
+          // Consider redirecting only on specific errors like 404 or auth issues
+          // router.push('/dashboard/chat'); // Reconsider redirecting on generic fetch errors
         }
       } finally {
         if (isMounted) {
@@ -117,7 +141,7 @@ export default function ChatPage() {
       isMounted = false;
       console.log("ChatPage unmounting or chatId changed.");
     };
-  }, [chatId, setMessages, router, messages.length]); // Add messages.length dependency
+  }, [chatId, setMessages, router, hasLoadedInitialMessages]); // Remove messages.length dependency
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -138,7 +162,7 @@ export default function ChatPage() {
 
       <main className="flex-1 flex flex-col bg-background"> {/* Added background color */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4"> {/* Added spacing */}
-          {isInitialLoading && (
+          {isInitialLoading && !hasLoadedInitialMessages && (
              <div className="flex justify-center items-center h-full">
                {/* <Spinner size="large" /> */}
                <p>Loading chat...</p> {/* Placeholder for spinner */}
@@ -152,7 +176,11 @@ export default function ChatPage() {
           )}
 
            {!isInitialLoading && messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
+            <ChatMessage 
+              key={message.id} 
+              message={message}
+              isNew={message.id === lastMessageId}
+            />
           ))}
           {/* Div to target for scrolling */}
           <div ref={messagesEndRef} />
@@ -161,8 +189,8 @@ export default function ChatPage() {
          {/* Optional: Display chat hook errors */}
          {error && (
              <div className="p-4 text-red-600 border-t border-border">
+
                <p>Error: {error.message}</p>
-               {/* You could add a retry button here if applicable */}
              </div>
           )}
 

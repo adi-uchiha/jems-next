@@ -13,6 +13,7 @@ interface Job {
 
 interface ChatMessageProps {
   message: Message;
+  isNew?: boolean;  // Add this prop
 }
 
 function parseJobRecommendations(content: string): { text: string; jobs: Job[] } {
@@ -53,14 +54,14 @@ function parseJobRecommendations(content: string): { text: string; jobs: Job[] }
   }
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
   const { text, jobs } = parseJobRecommendations(message.content);
 
   return (
     <motion.div
       className="flex gap-4 px-4 py-3 first:pt-6"
-      initial={{ y: 5, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      initial={isNew ? { y: 5, opacity: 0 } : false}
+      animate={isNew ? { y: 0, opacity: 1 } : false}
     >
       {/* Avatar */}
       <div className="size-8 border rounded-lg p-1.5 flex items-center justify-center shrink-0 text-muted-foreground">

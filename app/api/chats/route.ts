@@ -1,3 +1,6 @@
+//app/api/chat/route.ts
+//Contains get all chats of user and create new chat
+
 import { db } from "@/lib/database/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -11,20 +14,20 @@ export async function GET() {
     });
 
     if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const chats = await db
       .selectFrom('chats')
       .where('user_id', '=', session.user.id)
-      .select(['id', 'title', 'updated_at as updatedAt'])
+      .select(['id', 'title', 'created_at', 'updated_at'])
       .orderBy('updated_at', 'desc')
       .execute();
 
-    return new Response(JSON.stringify(chats));
+    return Response.json(chats);
   } catch (error) {
     console.error('Error fetching chats:', error);
-    return new Response("Internal Server Error", { status: 500 });
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -35,34 +38,25 @@ export async function POST(req: Request) {
     });
 
     if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title } = await req.json();
-    const chatId = nanoid();
+    const { title = "New Chat" } = await req.json();
     const now = new Date().toISOString();
 
     const newChat: NewChat = {
-      id: chatId,
+      id: nanoid(),
       user_id: session.user.id,
       title,
       created_at: now,
       updated_at: now
     };
 
-    await db
-      .insertInto('chats')
-      .values(newChat)
-      .execute();
+    await db.insertInto('chats').values(newChat).execute();
 
-    return new Response(JSON.stringify({ 
-      id: chatId, 
-      title,
-      created_at: now,
-      updated_at: now 
-    }));
+    return Response.json(newChat);
   } catch (error) {
     console.error('Error creating chat:', error);
-    return new Response("Internal Server Error", { status: 500 });
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

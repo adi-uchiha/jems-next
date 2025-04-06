@@ -5,7 +5,7 @@ import { getPineconeContext } from "@/lib/pinecone";
 import { db } from "@/lib/database/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getSystemPrompt } from "./prompt";
+import { getSystemPrompt } from "../../../lib/chat/prompt";
 
 export async function POST(req: Request) {
   try {

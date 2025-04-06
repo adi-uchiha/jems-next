@@ -6,7 +6,6 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
-    // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
     })

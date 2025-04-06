@@ -10,18 +10,18 @@ import { ChatSidebar } from "./components/ChatSidebar";
 export default function ChatPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, input: string) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, message: string) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!message.trim() || isLoading) return;
 
     setIsLoading(true);
     try {
-      // Create new chat
       const chatResponse = await fetch('/api/chats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: input.slice(0, 50) }), // Use first 50 chars as title
+        body: JSON.stringify({ title: message.slice(0, 50) }),
       });
       
       if (!chatResponse.ok) throw new Error('Failed to create chat');
@@ -34,6 +34,10 @@ export default function ChatPage() {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       <ChatSidebar />
@@ -41,8 +45,8 @@ export default function ChatPage() {
       <main className="flex-1 flex flex-col">
         <div className="flex-1" />
         <ChatInput 
-          input=""
-          handleInputChange={() => {}}
+          input={input}
+          handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           isLoading={isLoading}
           placeholder="Type a message to start a new chat..."

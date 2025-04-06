@@ -8,7 +8,9 @@ export default function ChatLayout({
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       <ChatSidebar />
-      {children}
+      <main className="flex-1 flex flex-col">
+        {children}
+      </main>
     </div>
   );
 }

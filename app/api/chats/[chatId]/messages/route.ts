@@ -1,3 +1,6 @@
+//api/chats/[chatId]/messages/route.ts
+//This file GET all messages of a chat, POST generate response and saves new messages.
+
 import { db } from "@/lib/database/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

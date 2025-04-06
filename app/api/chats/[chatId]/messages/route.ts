@@ -43,6 +43,12 @@ export async function POST(
   { params }: { params: { chatId: string } }
 ) {
   try {
+		const awaitedparams = await params;
+		// Validate chatId
+    if (!awaitedparams.chatId || awaitedparams.chatId === 'undefined') {
+      return Response.json({ error: "Missing or invalid chatId" }, { status: 400 });
+    }
+		
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -59,7 +65,7 @@ export async function POST(
     // Save user message
     const userMessage: NewChatMessage = {
       id: userMessageId,
-      chat_id: params.chatId,
+      chat_id: awaitedparams.chatId,
       role: 'user',
       content: lastMessageContent,
       created_at: now.toISOString()
@@ -107,7 +113,7 @@ export async function POST(
         if (text && text.trim().length > 0) {
           const assistantMessage: NewChatMessage = {
             id: nanoid(), // Generate new ID for assistant message
-            chat_id: params.chatId,
+            chat_id: awaitedparams.chatId,
             role: 'assistant',
             content: text, // Use the 'text' property from the callback
             created_at: new Date().toISOString() // Use current time for assistant message
@@ -122,7 +128,7 @@ export async function POST(
             await db
               .updateTable('chats')
               .set({ updated_at: new Date().toISOString() })
-              .where('id', '=', params.chatId)
+              .where('id', '=', awaitedparams.chatId)
               .execute();
             console.log('Chat timestamp updated successfully.');
 

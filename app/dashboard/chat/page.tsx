@@ -1,3 +1,5 @@
+//app/dashboard/chat/page.tsx
+
 "use client";
 
 import { Message, useChat } from "ai/react"; // v4 import

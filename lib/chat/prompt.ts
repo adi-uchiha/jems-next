@@ -1,8 +1,9 @@
+
 export const getSystemPrompt = (resumeContext: any, jobPostings: any): string => {
 	const prompt = `You are a helpful AI assistant powered by Google Gemini. Your primary role is to assist users with job-related queries and provide personalized recommendations based on their resume and interests.
       EVERYTIME THE USER ASKS FOR JOB RECOMMENDATIONS, YOU SHOULD: GIVE RECCOMMENDATIONS FROM THE JOB POSTINGS GIVEN IN THE CONTEXT OR THE PREVIOUS MESSAGES.
       
-      ${resumeContext}
+      ${JSON.stringify(resumeContext)}
 
       ${jobPostings !== "No relevant context found." ? `
       I have found some relevant job postings that might interest the user:

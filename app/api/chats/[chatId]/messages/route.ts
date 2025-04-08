@@ -110,6 +110,8 @@ export async function POST(
     console.log(`POST /messages: Context fetched for chat ${chatId}. System prompt length: ${systemPrompt?.length ?? 0}`);
 
     console.log(`POST /messages: Calling streamText for chat ${chatId}...`);
+    console.log(`POST /messages: System prompt: ${systemPrompt}`);
+    console.log(`POST /messages: Messages length: ${messages.length}`);
     const result = streamText({
       model: google("gemini-1.5-flash"),
       messages: [ { role: 'system', content: systemPrompt }, ...messages ],

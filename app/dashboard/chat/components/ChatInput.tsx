@@ -7,14 +7,10 @@ import { ChatRequestOptions } from 'ai';
 
 interface ChatInputProps {
   input: string;
-  // Update this type to exactly match useChat's handleInputChange
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
   ) => void;
-  handleSubmit: (
-    e: React.FormEvent<HTMLFormElement>,
-    chatRequestOptions?: ChatRequestOptions | undefined
-  ) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>, message: string) => void;
   isLoading: boolean;
   placeholder?: string;
   disabled?: boolean;
@@ -31,7 +27,7 @@ export function ChatInput({
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSubmit(e);
+    handleSubmit(e, input);
   };
 
   // No changes needed here, the Input component's onChange provides

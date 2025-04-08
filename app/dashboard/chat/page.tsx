@@ -4,7 +4,7 @@
 
 import { useRouter } from "next/navigation";
 import { ChatInput } from "./components/ChatInput";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { ChatSidebar } from "./components/ChatSidebar";
 
 export default function ChatPage() {
@@ -34,7 +34,9 @@ export default function ChatPage() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setInput(e.target.value);
   };
 

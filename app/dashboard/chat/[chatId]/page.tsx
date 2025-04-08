@@ -7,7 +7,7 @@ import { useChat, Message } from "ai/react";
 // import { ChatRequestOptions } from 'ai';
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ChatSidebar } from "../components/ChatSidebar";
+// import { ChatSidebar } from "../components/ChatSidebar";
 import { ChatInput } from "../components/ChatInput";
 import { ChatMessage } from "../components/ChatMessage";
 // import { Spinner } from "@/components/ui/spinner";
@@ -140,7 +140,7 @@ export default function ChatPage() {
   // --- Render Logic (No Changes) ---
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      <ChatSidebar />
+      {/* <ChatSidebsar /> */}
       <main className="flex-1 flex flex-col bg-background">
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Loading/Empty/Messages */}

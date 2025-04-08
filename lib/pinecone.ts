@@ -37,7 +37,7 @@ export async function getPineconeContext(query: string, topK: number = 15, minSc
       includeMetadata: true,
     });
 
-    console.log("PINECONE QUERY RESULTS", JSON.stringify(queryResult, null, 2));
+    // console.log("PINECONE QUERY RESULTS", JSON.stringify(queryResult, null, 2));
 
     // Ensure matches exist and log raw data
     const rawMatches = queryResult.matches || [];

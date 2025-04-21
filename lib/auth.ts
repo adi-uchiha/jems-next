@@ -14,23 +14,27 @@ import { reactInvitationEmail } from "./email/invitation";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { reactResetPasswordEmail } from "./email/rest-password";
 import { resend } from "./email/resend";
-import { MysqlDialect } from "kysely";
+import { MysqlDialect, PostgresDialect } from "kysely";
 import { createPool } from "mysql2/promise";
 import { nextCookies } from "better-auth/next-js";
 import { passkey } from "better-auth/plugins/passkey";
 import { libsql } from "./database/db";
+import { Pool } from "pg";
 
 const from = process.env.BETTER_AUTH_EMAIL || "delivered@resend.dev";
 const to = process.env.TEST_EMAIL || "";
 
-const dialect = libsql //To pass the dialect to the auth function
-
+const dialect = new PostgresDialect({
+  pool: new Pool({
+		connectionString: process.env.DATABASE_URL,
+  })
+})
 
 export const auth = betterAuth({
 	appName: "JEMS",
 	database: {
 		dialect,
-		type: "sqlite",
+		type: "postgres",
 	},
 	emailVerification: {
 		async sendVerificationEmail({ user, url }) {

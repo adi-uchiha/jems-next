@@ -1,5 +1,5 @@
 import { LibsqlDialect } from "@libsql/kysely-libsql";
-import { Kysely } from "kysely";
+import { Kysely, PostgresDialect } from "kysely";
 import { Database } from "./types";
 import { config } from 'dotenv';
 
@@ -20,6 +20,7 @@ export const libsql = new LibsqlDialect({
 	url: process.env.TURSO_DATABASE_URL,
 	authToken: process.env.TURSO_AUTH_TOKEN,
 });
+
 
 if (!libsql) {
 	throw new Error("No dialect found");

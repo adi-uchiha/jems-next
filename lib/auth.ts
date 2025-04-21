@@ -11,24 +11,17 @@ import {
 	oidcProvider,
 } from "better-auth/plugins";
 import { reactInvitationEmail } from "./email/invitation";
-import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { reactResetPasswordEmail } from "./email/rest-password";
 import { resend } from "./email/resend";
-import { MysqlDialect, PostgresDialect } from "kysely";
-import { createPool } from "mysql2/promise";
 import { nextCookies } from "better-auth/next-js";
 import { passkey } from "better-auth/plugins/passkey";
-import { libsql } from "./database/db";
-import { Pool } from "pg";
+import { pgsqldial } from "./database/db";
 
 const from = process.env.BETTER_AUTH_EMAIL || "delivered@resend.dev";
 const to = process.env.TEST_EMAIL || "";
 
-const dialect = new PostgresDialect({
-  pool: new Pool({
-		connectionString: process.env.DATABASE_URL,
-  })
-})
+const dialect = pgsqldial
+
 
 export const auth = betterAuth({
 	appName: "JEMS",

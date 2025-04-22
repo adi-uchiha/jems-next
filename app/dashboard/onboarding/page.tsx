@@ -99,8 +99,8 @@ export default function OnboardingPage() {
           job_title: parsedData.resumeData.job_title,
           location: "Remote",
           country: "us",
-          num_jobs: 25,
-          site_names: ["linkedin", "glassdoor"]
+          num_jobs: 5,
+          site_names: ["linkedin","zip_recruiter", "glassdoor", "google", "indeed"]
         })
       });
 

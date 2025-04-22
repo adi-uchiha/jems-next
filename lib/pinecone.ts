@@ -56,7 +56,7 @@ export async function getPineconeContext(query: string, topK: number = 15, minSc
 
 // Helper to fetch embedding from Python API
 async function getEmbedding(text: string): Promise<number[]> {
-  const response = await fetch(process.env.EMBEDDING_API_URL!, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/encode/text`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),

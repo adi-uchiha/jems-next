@@ -5,17 +5,22 @@ import { db } from "@/lib/database/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { nanoid } from "nanoid";
-import { NewChat, NewChatMessage } from "@/lib/database/types"; // Ensure NewChatMessage is imported if needed
+import { NextResponse } from "next/server";
+import type { NewChat, NewChatMessage } from "@/lib/database/types";
 
 export async function GET() {
+  console.log("GET /chats: Handler Entry");
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
     if (!session?.user?.id) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("GET /chats: Unauthorized access attempt");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    console.log(`GET /chats: Fetching chats for user ${session.user.id}`);
 
     const chats = await db
       .selectFrom('chats')
@@ -24,70 +29,91 @@ export async function GET() {
       .orderBy('updated_at', 'desc')
       .execute();
 
-    return Response.json(chats);
+    console.log(`GET /chats: Found ${chats.length} chats for user ${session.user.id}`);
+    return NextResponse.json(chats);
+
   } catch (error) {
-    console.error('Error fetching chats:', error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error('GET /chats: Error fetching chats:', error);
+    return NextResponse.json(
+      { error: "Internal Server Error" }, 
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: Request) {
+  console.log("POST /chats: Handler Entry");
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
     if (!session?.user?.id) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("POST /chats: Unauthorized access attempt");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { title = "New Chat", initialMessage } = await req.json();
 
-    // Validate initialMessage
+    // Validate input
     if (typeof initialMessage !== 'string' || initialMessage.trim().length === 0) {
-       return Response.json({ error: "Initial message cannot be empty" }, { status: 400 });
+      console.error("POST /chats: Invalid or missing initial message");
+      return NextResponse.json(
+        { error: "Initial message is required" }, 
+        { status: 400 }
+      );
     }
-
 
     const now = new Date().toISOString();
     const chatId = nanoid();
 
-    console.log(`Creating chat ${chatId} for user ${session.user.id} with title "${title}"`);
+    console.log(`POST /chats: Creating chat ${chatId} for user ${session.user.id}`);
 
     // Create new chat and initial message in a transaction
     await db.transaction().execute(async (trx) => {
       // Create chat
-      const chatInsertResult = await trx.insertInto('chats').values({
+      const newChat: NewChat = {
         id: chatId,
-        user_id: session.user.id, // Use the authenticated user's ID
-        title,
+        user_id: session.user.id,
+        title: title.trim(),
         created_at: now,
         updated_at: now
-      }).executeTakeFirst(); // Use executeTakeFirst if you need result, otherwise just execute
+      };
 
-      console.log('Chat insertion result:', chatInsertResult);
+      await trx
+        .insertInto('chats')
+        .values(newChat)
+        .execute();
 
+      // Create initial message
+      const newMessage: NewChatMessage = {
+        id: nanoid(),
+        chat_id: chatId,
+        role: 'user',
+        content: initialMessage.trim(),
+        created_at: now
+      };
 
-      // Create initial message - This is crucial for the flow
-      const messageInsertResult = await trx.insertInto('chat_messages').values({
-          id: nanoid(), // Generate ID for the message
-          chat_id: chatId,
-          role: 'user', // The initial message is from the user
-          content: initialMessage.trim(), // Use the provided initial message
-          created_at: now
-      }).executeTakeFirst(); // Use executeTakeFirst if you need result
+      await trx
+        .insertInto('chat_messages')
+        .values(newMessage)
+        .execute();
 
-      console.log('Initial message insertion result:', messageInsertResult);
-
+      console.log(`POST /chats: Successfully created chat ${chatId} with initial message`);
     });
 
-    console.log(`Successfully created chat ${chatId} and initial message.`);
-    // Return the ID and title of the newly created chat
-    return Response.json({ id: chatId, title });
+    return NextResponse.json({ 
+      id: chatId, 
+      title,
+      created_at: now,
+      updated_at: now 
+    });
 
   } catch (error) {
-    console.error('Error creating chat:', error);
-    // Provide more context in server logs but generic error to client
-    return Response.json({ error: "Failed to create chat due to an internal error." }, { status: 500 });
+    console.error('POST /chats: Error creating chat:', error);
+    return NextResponse.json(
+      { error: "Failed to create chat" },
+      { status: 500 }
+    );
   }
 }

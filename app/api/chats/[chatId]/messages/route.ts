@@ -132,6 +132,21 @@ export async function POST(
       .executeTakeFirst();
 
     const jobPostings = await getPineconeContext(lastMessage.content, 5, 0.3);
+    // console.log(jobPostings)
+    // {
+      //   "matches": [
+      //     {
+      //       "id": "94",
+      //       "score": 0.553743064,
+      //       "values": [],
+      //       "metadata": {
+      //         "company": "HDFC Bank",
+      //         "job_type": "",
+      //         "location": "Bengaluru, Karnataka, India",
+      //         "title": "Software Engineer-Frontend (App)",
+      //         "url": "https://www.linkedin.com/jobs/view/4208163163"
+      //       }
+      //     },
     const systemPrompt = getSystemPrompt(userResume, jobPostings);
 
     console.log(`POST /messages: Generated system prompt for chat ${chatId}`);

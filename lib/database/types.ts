@@ -38,11 +38,31 @@ export interface ChatMessageTable {
     created_at: ColumnType<Date, string | Date, string | Date>;
 }
 
+export interface RawJobsTable {
+    id: Generated<number>;
+    task_id: string;
+    external_id: string | null;
+    raw_data: unknown;
+    source_site: string | null;
+    title: string;
+    company: string;
+    location: string | null;
+    job_url: string | null;
+    job_type: string | null;
+    salary_interval: string | null;
+    salary_min: number | null;
+    salary_max: number | null;
+    salary_currency: string | null;
+    description: string | null;
+    created_at: ColumnType<Date, string | Date, string | Date>;
+}
+
 // Combine all tables interface
 export interface Database {
     resumes: ResumeTable;
     chats: ChatTable;
     chat_messages: ChatMessageTable;
+    raw_jobs: RawJobsTable;
 }
 
 // For GET operations - includes all fields
@@ -63,3 +83,8 @@ export type ChatUpdate = Updateable<ChatTable>;
 export type ChatMessage = Selectable<ChatMessageTable>;
 export type NewChatMessage = Insertable<ChatMessageTable>;
 export type ChatMessageUpdate = Updateable<ChatMessageTable>;
+
+// Raw job types
+export type RawJob = Selectable<RawJobsTable>;
+export type NewRawJob = Insertable<RawJobsTable>;
+export type RawJobUpdate = Updateable<RawJobsTable>;

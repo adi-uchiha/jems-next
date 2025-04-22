@@ -1,5 +1,6 @@
 //lib/pinecone.ts
 import { Pinecone } from "@pinecone-database/pinecone";
+import { db } from "./database/db";
 
 // Define metadata interface matching your Pinecone data
 interface JobMetadata {
@@ -24,32 +25,45 @@ const INDEX_NAME = process.env.PINECONE_INDEX || "job-embeddings";
 
 export async function getPineconeContext(query: string, topK: number = 15, minScore: number = 0.3): Promise<string> {
   try {
-    // Generate embedding for the query
     const embedding = await getEmbedding(query);
-    
-    // Get Pinecone index
     const index = pinecone.Index(INDEX_NAME);
     
-    // Query Pinecone with explicit typing
     const queryResult = await index.query({
       vector: embedding,
       topK,
       includeMetadata: true,
     });
 
-    // console.log("PINECONE QUERY RESULTS", JSON.stringify(queryResult, null, 2));
-
-    // Ensure matches exist and log raw data
     const rawMatches = queryResult.matches || [];
     if (rawMatches.length === 0) {
       return "No job matches found in Pinecone.";
-    } else {
-      return JSON.stringify(queryResult, null, 2);
     }
 
+    // Get URLs from Pinecone matches with type safety
+    const jobUrls = rawMatches
+      .map(match => match.metadata?.url)
+      .filter((url): url is string => typeof url === 'string' && url.length > 0);
+
+    if (jobUrls.length === 0) {
+      return "No valid job URLs found.";
+    }
+
+    // Fetch full job data from database
+    const fullJobsData = await db
+      .selectFrom('raw_jobs')
+      .select(['raw_data', 'title', 'company', 'location', 'description', 'source_site'])
+      .where('job_url', 'in', jobUrls as [string, ...string[]])
+      .execute();
+
+    return JSON.stringify({
+      matches: fullJobsData.map(job => ({
+        ...job,
+        raw_data: typeof job.raw_data === 'string' ? JSON.parse(job.raw_data) : job.raw_data
+      }))
+    }, null, 2);
 
   } catch (error) {
-    console.error("Error querying Pinecone:", error);
+    console.error("Error querying jobs:", error);
     return "Error fetching job recommendations.";
   }
 }

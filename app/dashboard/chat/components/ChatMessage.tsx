@@ -34,35 +34,48 @@ function parseJobRecommendations(content: string): { text: string; jobs: Job[] }
   let jobs: Job[] = [];
 
   try {
-    // Since the AI is sending JSON directly after JOB_RECOMMENDATIONS:, 
-    // we can try to parse it directly
-    const jsonStartIndex = recommendationsSection.indexOf('[');
-    const jsonEndIndex = recommendationsSection.lastIndexOf(']') + 1;
+    // Find potential JSON arrays in the text
+    const matches = recommendationsSection.match(/\[[\s\S]*?\]/g);
     
-    if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-      const jsonString = recommendationsSection.substring(jsonStartIndex, jsonEndIndex);
-      const parsedData = JSON.parse(jsonString);
-
-      if (Array.isArray(parsedData)) {
-        jobs = parsedData.filter(job =>
-          job &&
-          typeof job.id === 'string' &&
-          typeof job.title === 'string' &&
-          typeof job.company === 'string' &&
-          typeof job.location === 'string' &&
-          typeof job.url === 'string'
-        );
-        console.log(`ChatMessage: Successfully parsed ${jobs.length} jobs`);
+    if (matches && matches.length > 0) {
+      // Try parsing each potential JSON array
+      for (const match of matches) {
+        try {
+          const parsedData = JSON.parse(match);
+          if (Array.isArray(parsedData)) {
+            const validJobs = parsedData.filter(job =>
+              job &&
+              typeof job === 'object' &&
+              'id' in job &&
+              'title' in job &&
+              'company' in job &&
+              'location' in job &&
+              'url' in job
+            );
+            
+            if (validJobs.length > 0) {
+              jobs = validJobs;
+              break; // Use the first valid array found
+            }
+          }
+        } catch (parseError) {
+          console.debug("Failed to parse potential JSON array:", parseError);
+          continue; // Try next match if available
+        }
       }
     }
 
-    // Get any remaining text after the JSON array
-    const remainingText = recommendationsSection.substring(jsonEndIndex).trim();
+    // Get text after the JSON array
+    const jsonEndIndex = recommendationsSection.lastIndexOf(']') + 1;
+    const remainingText = jsonEndIndex > 0 
+      ? recommendationsSection.substring(jsonEndIndex).trim()
+      : recommendationsSection;
+
     return {
       text: textPart + (remainingText ? '\n\n' + remainingText : ''),
       jobs
     };
-    
+
   } catch (e) {
     console.error("ChatMessage: Failed to parse job recommendations:", e);
     return { text: content, jobs: [] };

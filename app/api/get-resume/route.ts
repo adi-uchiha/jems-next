@@ -6,10 +6,6 @@ import { headers } from "next/headers"
 export async function GET() {
   console.log("GET HIT /api/get-resume")
   try {
-    // Check authentication using the same method as parse-resume
-
-    // console.log("Headers:", await headers())
-    console.log("Auth:")
     const session = await auth.api.getSession({
       headers: await headers(),
     })
@@ -25,16 +21,16 @@ export async function GET() {
         }
       )
     }
-    console.log("Session User:", session.user)
-    console.log("calling db")
+    // console.log("Session User:", session.user)
+    // console.log("calling db")
 
-    // Get the most recent active resume for the user
+    // Updated column names to match database schema
     const resume = await db
       .selectFrom("resumes")
       .selectAll()
-      .where("userId", "=", session.user.id)
+      .where("user_id", "=", session.user.id) // Changed from userId to user_id
       .where("status", "=", "active")
-      .orderBy("updatedAt", "desc")
+      .orderBy("updated_at", "desc") // Changed from updatedAt to updated_at
       .limit(1)
       .executeTakeFirst()
 
@@ -50,22 +46,22 @@ export async function GET() {
       )
     }
 
-    // Transform the data to match the frontend form structure
+    // Transform the data to match the frontend form structure using the correct column names
     const response = {
       id: resume.id,
-      personalInfoName: resume.personalInfoName,
-      personalInfoPhone: resume.personalInfoPhone,
-      personalInfoEmail: resume.personalInfoEmail,
-      personalInfoLinkedIn: resume.personalInfoLinkedIn,
-      personalInfoGithub: resume.personalInfoGithub,
+      personalInfoName: resume.personal_info_name,
+      personalInfoPhone: resume.personal_info_phone,
+      personalInfoEmail: resume.personal_info_email,
+      personalInfoLinkedIn: resume.personal_info_linkedin,
+      personalInfoGithub: resume.personal_info_github,
       education: resume.education,
       experience: resume.experience,
       projects: resume.projects,
-      technicalSkills: resume.technicalSkills,
-      certificationsAchievements: resume.certificationsAchievements,
+      technicalSkills: resume.technical_skills,
+      certificationsAchievements: resume.certifications_achievements,
       status: resume.status,
-      createdAt: resume.createdAt,
-      updatedAt: resume.updatedAt,
+      createdAt: resume.created_at,
+      updatedAt: resume.updated_at,
     }
 
     return NextResponse.json(

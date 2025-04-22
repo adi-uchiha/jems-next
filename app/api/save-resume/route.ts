@@ -29,23 +29,23 @@ export async function POST(req: Request) {
     const { resumeData } = data
     
     const newResume: NewResume = {
-      userId: session.user.id,
+      user_id: session.user.id,
       title: "Resume", // You can make this dynamic if needed
-      filePath: null,
-      fileType: null,
+      file_path: null,
+      file_type: null,
       status: "active",
-      personalInfoName: resumeData.personal_info.name,
-      personalInfoPhone: resumeData.personal_info.phone,
-      personalInfoEmail: resumeData.personal_info.email,
-      personalInfoLinkedIn: resumeData.personal_info.linkedin || null,
-      personalInfoGithub: resumeData.personal_info.github || null,
+      personal_info_name: resumeData.personal_info.name,
+      personal_info_phone: resumeData.personal_info.phone,
+      personal_info_email: resumeData.personal_info.email,
+      personal_info_linkedin: resumeData.personal_info.linkedin || null,
+      personal_info_github: resumeData.personal_info.github || null,
       education: JSON.stringify(resumeData.education),
       experience: JSON.stringify(resumeData.experience),
       projects: JSON.stringify(resumeData.projects),
-      technicalSkills: JSON.stringify(resumeData.technical_skills),
-      certificationsAchievements: JSON.stringify(resumeData.certifications_and_achievements),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      technical_skills: JSON.stringify(resumeData.technical_skills),
+      certifications_achievements: JSON.stringify(resumeData.certifications_and_achievements),
+      created_at: new Date(),
+      updated_at: new Date()
     }
 
     await db.insertInto('resumes')

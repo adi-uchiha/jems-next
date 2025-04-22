@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { UploadDropzone } from "@/utils/uploadthing"
+import { toast } from "@/hooks/use-toast"
 
 interface UploadState {
   status: "idle" | "uploading" | "error" | "success"
@@ -90,11 +91,38 @@ export default function OnboardingPage() {
       if (!saveResponse.ok) throw new Error('Failed to save resume');
       await completeStep(3);
 
+      // Create task with API server
+      const createTaskResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/task/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_title: parsedData.resumeData.job_title,
+          location: "Remote",
+          country: "us",
+          num_jobs: 25,
+          site_names: ["linkedin", "glassdoor"]
+        })
+      });
+
+      if (!createTaskResponse.ok) throw new Error('Failed to create task');
+      const taskData = await createTaskResponse.json();
+      
+      // Add toast notification
+      toast({
+        title: "Job Search Started",
+        description: "We've started scraping job listings based on your resume. This may take a few minutes.",
+        duration: 5000, // Show for 5 seconds
+      });
+
       router.push('/edit-resume');
 
     } catch (error) {
       console.error('Error during processing:', error);
-      // toast.error("Failed to process resume");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process resume. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }

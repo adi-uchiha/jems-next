@@ -35,6 +35,7 @@ interface ResumeOutput {
 	}[]; // Array of project entries.  Extract ALL instances.
 	technical_skills: string[]; // Array of technical skills.  Extract ALL.
 	certifications_and_achievements: string[]; // Array of certifications and achievements. Extract ALL.
+	job_title: string; // Required.  Extract the job title suitable for the resume.
 }
 
 Return me the JSON Oject only and No text outside the JSON object.`

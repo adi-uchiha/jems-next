@@ -236,7 +236,11 @@ export default function EditResumePage() {
                         <FormItem>
                           <FormLabel>Location</FormLabel>
                           <FormControl>
-                            <Input placeholder="City, Country" className="bg-background text-foreground" {...field} />
+                            <Input 
+                              placeholder="City, Country" 
+                              className="bg-background text-foreground" 
+                              {...field} // Add missing spread operator
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -250,7 +254,11 @@ export default function EditResumePage() {
                         <FormItem>
                           <FormLabel>Duration</FormLabel>
                           <FormControl>
-                            <Input placeholder="2020 - 2024" className="bg-background text-foreground" {...field} />
+                            <Input 
+                              placeholder="2020 - 2024" 
+                              className="bg-background text-foreground"
+                              {...field} // Add missing spread operator
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -313,7 +321,11 @@ export default function EditResumePage() {
                         <FormItem>
                           <FormLabel>Title</FormLabel>
                           <FormControl>
-                            <Input placeholder="Software Engineer" className="bg-background text-foreground" {...field} />
+                            <Input 
+                              placeholder="Software Engineer" 
+                              className="bg-background text-foreground"
+                              {...field} // Add missing spread operator
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -518,7 +530,11 @@ export default function EditResumePage() {
                         <FormItem>
                           <FormLabel>Project Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Project Name" className="bg-background text-foreground" {...field} />
+                            <Input 
+                              placeholder="Project Name" 
+                              className="bg-background text-foreground"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -532,7 +548,11 @@ export default function EditResumePage() {
                         <FormItem>
                           <FormLabel>Duration</FormLabel>
                           <FormControl>
-                            <Input placeholder="MM/YYYY - MM/YYYY" className="bg-background text-foreground" {...field} />
+                            <Input 
+                              placeholder="Jan 2023 - Present" 
+                              className="bg-background text-foreground"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -678,10 +698,12 @@ export default function EditResumePage() {
                         <FormItem className="flex-1">
                           <FormControl>
                             <Input
+                              placeholder="Add a skill"
                               className="border-none p-0 h-auto w-auto focus-visible:ring-0 text-foreground bg-background"
                               {...field}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

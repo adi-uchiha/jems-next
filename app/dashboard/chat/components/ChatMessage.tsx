@@ -32,58 +32,41 @@ function parseJobRecommendations(content: string): { text: string; jobs: Job[] }
   const recommendationsSection = content.substring(markerIndex + marker.length);
 
   let jobs: Job[] = [];
-  let jsonString: string | null = null;
 
-  // Prioritize extracting from ```json block
-  const jsonBlockMatch = recommendationsSection.match(/```json\s*([\s\S]*?)\s*```/);
-
-  if (jsonBlockMatch && jsonBlockMatch[1]) {
-    jsonString = jsonBlockMatch[1].trim();
-    console.log("ChatMessage: Found JSON block:", jsonString);
-  } else {
-     // --- Fallback REMOVED ---
-     // If no explicit json block, assume no structured jobs were intended or correctly formatted
-     console.warn("ChatMessage: JOB_RECOMMENDATIONS marker found, but no ```json block. Treating as text.");
-     // Return the rest of the section as text if needed, or just the text part
-     // For simplicity, let's just return the text before the marker for now.
-     // If the AI includes text after the marker BUT outside a ```json block, it will be ignored.
-     return { text: textPart, jobs: [] };
-  }
-
-  if (jsonString) {
-    try {
-      // Attempt to parse the extracted JSON string
+  try {
+    // Since the AI is sending JSON directly after JOB_RECOMMENDATIONS:, 
+    // we can try to parse it directly
+    const jsonStartIndex = recommendationsSection.indexOf('[');
+    const jsonEndIndex = recommendationsSection.lastIndexOf(']') + 1;
+    
+    if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+      const jsonString = recommendationsSection.substring(jsonStartIndex, jsonEndIndex);
       const parsedData = JSON.parse(jsonString);
 
-      // Validate if it's an array and filter for valid job objects
       if (Array.isArray(parsedData)) {
         jobs = parsedData.filter(job =>
-          job && // Check if job is not null/undefined
+          job &&
           typeof job.id === 'string' &&
           typeof job.title === 'string' &&
           typeof job.company === 'string' &&
           typeof job.location === 'string' &&
           typeof job.url === 'string'
         );
-        console.log(`ChatMessage: Parsed ${jobs.length} valid jobs.`);
-      } else {
-         console.warn("ChatMessage: Parsed data is not an array.", parsedData);
+        console.log(`ChatMessage: Successfully parsed ${jobs.length} jobs`);
       }
-
-    } catch (e: unknown) {
-      // Log the specific error and the string that failed
-      console.error("ChatMessage: Failed to parse job recommendations JSON.", {
-         error: e instanceof Error ? e.message : String(e),
-         jsonStringAttempted: jsonString // Log the string we tried to parse
-      });
-      // Keep jobs as empty array on error
     }
-  }
 
-  return {
-    text: textPart, // Return only the text part before the marker
-    jobs
-  };
+    // Get any remaining text after the JSON array
+    const remainingText = recommendationsSection.substring(jsonEndIndex).trim();
+    return {
+      text: textPart + (remainingText ? '\n\n' + remainingText : ''),
+      jobs
+    };
+    
+  } catch (e) {
+    console.error("ChatMessage: Failed to parse job recommendations:", e);
+    return { text: content, jobs: [] };
+  }
 }
 
 

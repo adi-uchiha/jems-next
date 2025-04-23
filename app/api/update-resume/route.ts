@@ -1,96 +1,71 @@
-import { NextResponse } from "next/server"
-import { db } from "@/lib/database/db"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { ResumeUpdate, NewResume } from "@/lib/database/types"
+import { db, stringifyForDB } from "@/lib/database/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
   try {
-    // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
-    })
+    });
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Parse request body
-    const values = await req.json()
+    const values = await req.json();
+    console.log("Update Resume Data:", values);
 
-    // Base data with all required fields
-    const baseData = {
-      title: "Resume",
-      status: "active" as const,
-      personalInfoName: values.personalInfo.name,
-      personalInfoPhone: values.personalInfo.phone,
-      personalInfoEmail: values.personalInfo.email,
-      personalInfoLinkedIn: values.personalInfo.linkedin || null,
-      personalInfoGithub: values.personalInfo.github || null,
-      education: JSON.stringify(values.education),
-      experience: JSON.stringify(values.experience),
-      projects: JSON.stringify(values.projects),
-      technicalSkills: JSON.stringify(values.technicalSkills),
-      certificationsAchievements: JSON.stringify(values.certificationsAchievements),
-      updatedAt: new Date(),
-    }
-
-    // First find the most recent active resume
+    // Check if resume exists
     const existingResume = await db
       .selectFrom("resumes")
-      .selectAll()
-      .where("userId", "=", session.user.id)
+      .where("user_id", "=", session.user.id)
       .where("status", "=", "active")
-      .orderBy("updatedAt", "desc")
-      .limit(1)
-      .executeTakeFirst()
+      .select(["id"])
+      .executeTakeFirst();
 
-    if (existingResume) {
-      // Update existing resume
-      await db
-        .updateTable("resumes")
-        .set(baseData)
-        .where("id", "=", existingResume.id)
-        .execute()
-    } else {
-      // Create new resume with proper typing
-      const newResumeData: NewResume = {
-        ...baseData,
-        userId: session.user.id,
-        status: "active",
-        fileType: null,
-        filePath: null,
-        createdAt: new Date(),
-        title: "Resume",
-        education: JSON.stringify(values.education),
-        experience: JSON.stringify(values.experience),
-        projects: JSON.stringify(values.projects),
-        technicalSkills: JSON.stringify(values.technicalSkills),
-        certificationsAchievements: JSON.stringify(values.certificationsAchievements),
-      }
-
-      await db
-        .insertInto("resumes")
-        .values(newResumeData)
-        .execute()
+    if (!existingResume) {
+      return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ 
+    // Handle both data structure formats
+    const personalInfo = values.personalInfo || values;
+    const updateData = {
+      title: "Resume",
+      status: "active" as const,
+      personal_info_name: personalInfo.name || personalInfo.personalInfoName,
+      personal_info_phone: personalInfo.phone || personalInfo.personalInfoPhone,
+      personal_info_email: personalInfo.email || personalInfo.personalInfoEmail,
+      personal_info_linkedin: personalInfo.linkedin || personalInfo.personalInfoLinkedIn || null,
+      personal_info_github: personalInfo.github || personalInfo.personalInfoGithub || null,
+      education: stringifyForDB(values.education || []),
+      experience: stringifyForDB(values.experience || []),
+      projects: stringifyForDB(values.projects || []),
+      technical_skills: stringifyForDB(values.technicalSkills || values.technical_skills || []),
+      certifications_achievements: stringifyForDB(values.certificationsAchievements || values.certifications_achievements || []),
+      updated_at: new Date().toISOString()
+    };
+
+    await db
+      .updateTable("resumes")
+      .set(updateData)
+      .where("id", "=", existingResume.id)
+      .execute();
+
+    return NextResponse.json({
       success: true,
       message: "Resume updated successfully"
-    })
+    });
 
   } catch (error) {
-    console.error("Error updating resume:", error)
-    return NextResponse.json(
-      { 
-        error: "Failed to update resume",
-        details: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    )
+    console.error("Error updating resume:", error);
+    return NextResponse.json({
+      error: "Failed to update resume",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 });
   }
+}
+
+export async function POST(req: Request) {
+  return PUT(req);
 }

@@ -23,11 +23,16 @@ export const getSystemPrompt = (resumeContext: any, jobPostings: any): string =>
       - company: company name
       - location: job location
       - url: job posting URL
+      - source_site: the source site of the job posting
       
       Example format:
       Based on your experience with [specific technology] at [previous company], this role at...
       
       JOB_RECOMMENDATIONS:[{"id":"123","title":"Software Engineer","company":"Google","location":"CA, US","url":"https://..."}]
-      ` : 'Unfortunately, I could not find any relevant job postings at the moment. Let me help you with general career advice based on your background instead.'}`
+      ` : 'Unfortunately, I could not find any relevant job postings at the moment. Let me help you with general career advice based on your background instead.'}
+      IMPORTANT: ALWAYS GIVE JOB RECCOMENDATION WHEN THE UESR HAVE ASKED FOR IT.
+      YOU CAN REPEAT THE RECCOMENDATIONS.
+      GIVE AS MANY RECCOMENDATIONS AS MUCH POSSIBLE.
+      `
 	return prompt;
 }

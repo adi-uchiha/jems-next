@@ -576,3 +576,23 @@ html {
   @apply bg-primary/10 text-primary;
   @apply dark:bg-primary/20 dark:text-primary;
 }
+
+/* Job Card Specific Styles */
+.job-card-animation {
+  @apply transform transition-all duration-300;
+  @apply hover:shadow-lg hover:-translate-y-1;
+  @apply hover:border-primary/20;
+}
+
+.job-card-icon-container {
+  @apply p-1.5 rounded-md;
+  @apply bg-gradient-to-br from-primary/10 to-primary/5;
+  @apply group-hover:from-primary/15 group-hover:to-primary/10;
+  @apply transition-all duration-300;
+}
+
+.job-card-glass {
+  @apply backdrop-blur-sm bg-gradient-to-b;
+  @apply from-white/50 to-white/30;
+  @apply dark:from-black/40 dark:to-black/20;
+}

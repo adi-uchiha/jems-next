@@ -132,7 +132,7 @@ export async function POST(
       .executeTakeFirst();
 
     const jobPostings = await getPineconeContext(lastMessage.content, 5, 0.3);
-    // console.log(jobPostings)
+    console.log(jobPostings)
     // {
       //   "matches": [
       //     {

@@ -17,3 +17,4 @@ export function getSourceIcon(url: string, source?: string): string {
   // Default icon
   return '/images/platforms/default.png';
 }
+ 

@@ -91,31 +91,23 @@ export default function EditResumePage() {
         if (!response.ok) throw new Error("Failed to fetch resume")
         const data = await response.json()
         
-        // Safely parse JSON strings, with fallbacks
-        const parsedData = {
-          ...data,
-          education: safeParseJSON(data.education, []),
-          experience: safeParseJSON(data.experience, []),
-          projects: safeParseJSON(data.projects, []),
-          technical_skills: safeParseJSON(data.technical_skills, []),
-          certifications_achievements: safeParseJSON(data.certifications_achievements, [])
-        }
-        
-        setResumeData(parsedData)
-        form.reset({
+        const formData = {
           personalInfo: {
-            name: parsedData.personal_info_name || "",
-            phone: parsedData.personal_info_phone || "",
-            email: parsedData.personal_info_email || "",
-            linkedin: parsedData.personal_info_linkedin || "",
-            github: parsedData.personal_info_github || "",
+            name: data.personalInfoName,
+            phone: data.personalInfoPhone,
+            email: data.personalInfoEmail,
+            linkedin: data.personalInfoLinkedIn || "",
+            github: data.personalInfoGithub || "",
           },
-          education: parsedData.education || [],
-          experience: parsedData.experience || [],
-          projects: parsedData.projects || [],
-          technicalSkills: parsedData.technical_skills || [],
-          certificationsAchievements: parsedData.certifications_achievements || [],
-        })
+          education: data.education || [],
+          experience: data.experience || [],
+          projects: data.projects || [],
+          technicalSkills: data.technicalSkills || [],
+          certificationsAchievements: data.certificationsAchievements || [],
+        }
+
+        setResumeData(data)
+        form.reset(formData)
       } catch (error) {
         console.error("Error fetching resume:", error)
         toast.error("Failed to load resume data")
@@ -127,10 +119,24 @@ export default function EditResumePage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true)
     try {
+      // Transform form data to match API expectations
+      const apiData = {
+        personalInfoName: values.personalInfo.name,
+        personalInfoPhone: values.personalInfo.phone,
+        personalInfoEmail: values.personalInfo.email,
+        personalInfoLinkedIn: values.personalInfo.linkedin,
+        personalInfoGithub: values.personalInfo.github,
+        education: values.education,
+        experience: values.experience,
+        projects: values.projects,
+        technicalSkills: values.technicalSkills,
+        certificationsAchievements: values.certificationsAchievements,
+      }
+
       const response = await fetch("/api/update-resume", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(apiData),
       })
 
       if (!response.ok) throw new Error("Failed to update resume")
@@ -810,15 +816,4 @@ export default function EditResumePage() {
       </Form>
     </div>
   )
-}
-
-// Add this helper function at the top of the file
-function safeParseJSON<T>(jsonString: string | null | undefined, fallback: T): T {
-  if (!jsonString) return fallback;
-  try {
-    return JSON.parse(jsonString) as T;
-  } catch (e) {
-    console.warn('Failed to parse JSON:', e);
-    return fallback;
-  }
 }

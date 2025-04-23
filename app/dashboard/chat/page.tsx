@@ -5,7 +5,6 @@
 import { useRouter } from "next/navigation";
 import { ChatInput } from "./components/ChatInput"; // Corrected import path
 import { useState, ChangeEvent, FormEvent } from "react"; // Added FormEvent
-import { ChatSidebar } from "./components/ChatSidebar"; // Corrected import path
 
 export default function NewChatPage() { // Renamed component for clarity
   const router = useRouter();
@@ -62,7 +61,6 @@ export default function NewChatPage() { // Renamed component for clarity
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      <ChatSidebar />
 
       <main className="flex-1 flex flex-col bg-background justify-end"> {/* Align content bottom */}
          {/* Optional: Add a welcome message or instructions here */}

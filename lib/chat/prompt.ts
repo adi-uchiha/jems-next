@@ -33,6 +33,7 @@ export const getSystemPrompt = (resumeContext: any, jobPostings: any): string =>
       IMPORTANT: ALWAYS GIVE JOB RECCOMENDATION WHEN THE UESR HAVE ASKED FOR IT.
       YOU CAN REPEAT THE RECCOMENDATIONS.
       GIVE AS MANY RECCOMENDATIONS AS MUCH POSSIBLE.
+      ALWAYS GIVE JOB RECCOMENDATIONS IN YOUR RESPONSE!
       `
 	return prompt;
 }

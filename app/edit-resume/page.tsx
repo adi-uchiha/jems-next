@@ -91,30 +91,30 @@ export default function EditResumePage() {
         if (!response.ok) throw new Error("Failed to fetch resume")
         const data = await response.json()
         
-        // Parse JSON strings back to objects
+        // Safely parse JSON strings, with fallbacks
         const parsedData = {
           ...data,
-          education: JSON.parse(data.education),
-          experience: JSON.parse(data.experience),
-          projects: JSON.parse(data.projects),
-          technicalSkills: JSON.parse(data.technicalSkills),
-          certificationsAchievements: JSON.parse(data.certificationsAchievements),
+          education: safeParseJSON(data.education, []),
+          experience: safeParseJSON(data.experience, []),
+          projects: safeParseJSON(data.projects, []),
+          technical_skills: safeParseJSON(data.technical_skills, []),
+          certifications_achievements: safeParseJSON(data.certifications_achievements, [])
         }
         
         setResumeData(parsedData)
         form.reset({
           personalInfo: {
-            name: parsedData.personalInfoName,
-            phone: parsedData.personalInfoPhone,
-            email: parsedData.personalInfoEmail,
-            linkedin: parsedData.personalInfoLinkedIn || "",
-            github: parsedData.personalInfoGithub || "",
+            name: parsedData.personal_info_name || "",
+            phone: parsedData.personal_info_phone || "",
+            email: parsedData.personal_info_email || "",
+            linkedin: parsedData.personal_info_linkedin || "",
+            github: parsedData.personal_info_github || "",
           },
-          education: parsedData.education,
-          experience: parsedData.experience,
-          projects: parsedData.projects,
-          technicalSkills: parsedData.technicalSkills,
-          certificationsAchievements: parsedData.certificationsAchievements,
+          education: parsedData.education || [],
+          experience: parsedData.experience || [],
+          projects: parsedData.projects || [],
+          technicalSkills: parsedData.technical_skills || [],
+          certificationsAchievements: parsedData.certifications_achievements || [],
         })
       } catch (error) {
         console.error("Error fetching resume:", error)
@@ -810,4 +810,15 @@ export default function EditResumePage() {
       </Form>
     </div>
   )
+}
+
+// Add this helper function at the top of the file
+function safeParseJSON<T>(jsonString: string | null | undefined, fallback: T): T {
+  if (!jsonString) return fallback;
+  try {
+    return JSON.parse(jsonString) as T;
+  } catch (e) {
+    console.warn('Failed to parse JSON:', e);
+    return fallback;
+  }
 }

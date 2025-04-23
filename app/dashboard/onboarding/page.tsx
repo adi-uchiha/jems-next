@@ -29,20 +29,25 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: "Uploading your resume",
-    subtitle: "Sending your resume to uploadthing",
+    title: "Upload Resume",
+    subtitle: "Uploading your resume file",
   },
   {
     id: 2,
-    title: "Reading your resume",
-    subtitle: "Organizing your resume details",
+    title: "Parsing Resume",
+    subtitle: "Extracting information from your resume",
   },
   {
     id: 3,
-    title: "Saving your resume",
-    subtitle: "Storing your information for easy access",
+    title: "Finding Jobs",
+    subtitle: "Searching for relevant job postings",
   },
-]
+  {
+    id: 4,
+    title: "Finalizing Setup",
+    subtitle: "Setting up your personalized job feed",
+  }
+];
 
 export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -70,7 +75,10 @@ export default function OnboardingPage() {
     try {
       if (!uploadState.fileUrl) throw new Error('No file URL available');
 
-      // Step 2: Parse Resume with LLM
+      // Step 1: Upload Complete
+      await completeStep(1);
+
+      // Step 2: Parse Resume
       const parseResponse = await fetch("/api/parse-resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,17 +89,7 @@ export default function OnboardingPage() {
       const parsedData = await parseResponse.json();
       await completeStep(2);
 
-      // Step 3: Save to Database
-      const saveResponse = await fetch('/api/save-resume', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeData: parsedData.resumeData })
-      });
-
-      if (!saveResponse.ok) throw new Error('Failed to save resume');
-      await completeStep(3);
-
-      // Create task with API server
+      // Step 3: Start Job Search
       const createTaskResponse = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/api/task/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,19 +97,28 @@ export default function OnboardingPage() {
           job_title: parsedData.resumeData.job_title,
           location: "Remote",
           country: "us",
-          num_jobs: 5,
-          site_names: ["linkedin","zip_recruiter", "glassdoor", "google", "indeed"]
+          num_jobs: 50,
+          site_names: ["linkedin", "zip_recruiter", "glassdoor", "google", "indeed"]
         })
       });
 
       if (!createTaskResponse.ok) throw new Error('Failed to create task');
-      const taskData = await createTaskResponse.json();
-      
-      // Add toast notification
+      await completeStep(3);
+
+      // Step 4: Save Resume & Complete Setup
+      const saveResponse = await fetch('/api/save-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeData: parsedData.resumeData })
+      });
+
+      if (!saveResponse.ok) throw new Error('Failed to save resume');
+      await completeStep(4);
+
       toast({
-        title: "Job Search Started",
-        description: "We've started scraping job listings based on your resume. This may take a few minutes.",
-        duration: 5000, // Show for 5 seconds
+        title: "Setup Complete",
+        description: "Your profile has been created and job search is in progress.",
+        duration: 5000,
       });
 
       router.push('/edit-resume');
@@ -126,17 +133,18 @@ export default function OnboardingPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     await processSteps()
   }
 
   const getStepStatus = (stepId: number) => {
-    if (completedSteps.includes(stepId)) return "completed"
-    if (stepId === currentStep && isSubmitting) return "current"
-    return "pending"
-  }
+    if (completedSteps.includes(stepId)) return "completed";
+    if (stepId === currentStep && isSubmitting) return "current";
+    if (stepId < currentStep) return "completed";
+    return "pending";
+  };
 
   const renderUploadContent = () => {
     switch (uploadState.status) {
@@ -269,38 +277,41 @@ export default function OnboardingPage() {
           </CardHeader>
           <CardContent>
             <div className="relative">
-              <motion.div 
-                className="absolute left-4 top-4 w-0.5 bg-muted"
-                style={{ height: `${((steps.length) * 40) + 55}px` }}
-              >
+              {/* Improved progress line */}
+              <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-muted">
                 <motion.div
-                  className="absolute top-0 w-full bg-primary origin-top"
+                  className="absolute inset-0 bg-primary origin-top"
                   initial={{ scaleY: 0 }}
-                  animate={{ scaleY: Math.min((completedSteps.length / steps.length), 1) }}
-                  transition={{ duration: 0.5 }}
-                  style={{ height: "100%" }}
+                  animate={{ 
+                    scaleY: completedSteps.length ? (completedSteps.length / steps.length) : 0 
+                  }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
                 />
-              </motion.div>
-              <div className="relative space-y-6">
+              </div>
+
+              <div className="relative space-y-8">
                 {steps.map((step) => {
-                  const status = getStepStatus(step.id)
+                  const status = getStepStatus(step.id);
                   return (
-                    <div
+                    <motion.div
                       key={step.id}
                       className={cn(
-                        "flex items-start gap-4 transition-opacity duration-300 h-10",
-                        status === "pending" ? "opacity-50" : "opacity-100",
+                        "flex items-start gap-4 transition-all duration-300",
+                        status === "pending" ? "opacity-50" : "opacity-100"
                       )}
+                      animate={{
+                        opacity: status === "pending" ? 0.5 : 1,
+                      }}
                     >
-                      <div
+                      <motion.div
                         className={cn(
-                          "relative flex items-center justify-center w-8 h-8 rounded-full border-2 bg-background",
-                          status === "completed"
-                            ? "border-primary bg-primary"
-                            : status === "current" && isSubmitting
-                              ? "border-primary"
-                              : "border-muted",
+                          "relative flex items-center justify-center w-8 h-8 rounded-full border-2 bg-background transition-colors",
+                          status === "completed" ? "border-primary bg-primary" :
+                          status === "current" ? "border-primary" : "border-muted"
                         )}
+                        animate={{
+                          scale: status === "current" ? 1.1 : 1,
+                        }}
                       >
                         {status === "completed" ? (
                           <motion.div
@@ -313,15 +324,16 @@ export default function OnboardingPage() {
                         ) : status === "current" && isSubmitting ? (
                           <Loader2 className="w-4 h-4 text-primary animate-spin" />
                         ) : null}
-                      </div>
+                      </motion.div>
                       <div className="pt-1">
                         <h3 className="text-sm font-medium">{step.title}</h3>
                         <p className="text-xs text-muted-foreground">{step.subtitle}</p>
                       </div>
-                    </div>
-                  )
+                    </motion.div>
+                  );
                 })}
               </div>
+              
               <AnimatePresence mode="popLayout">
                 {completedSteps.length === steps.length && (
                   <motion.div

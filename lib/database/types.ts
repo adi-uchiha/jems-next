@@ -13,13 +13,39 @@ export interface ResumeTable {
     personal_info_email: string; // Changed from personalInfoEmail
     personal_info_linkedin: string | null; // Changed from personalInfoLinkedIn
     personal_info_github: string | null; // Changed from personalInfoGithub
-    education: string; // JSONB stored as string
+    education: string; // Will store stringified JSON
     experience: string;
     projects: string;
     technical_skills: string;
     certifications_achievements: string; // Changed from certificationsAchievements
     created_at: ColumnType<Date, string | Date, string | Date>; // Changed from createdAt
     updated_at: ColumnType<Date, string | Date, string | Date>; // Changed from updatedAt
+}
+
+// Add type definitions for the parsed data
+export interface ParsedResume extends Omit<Resume, 'education' | 'experience' | 'projects' | 'technical_skills' | 'certifications_achievements'> {
+    education: Array<{
+        institution: string;
+        degree: string;
+        location: string;
+        duration: string;
+    }>;
+    experience: Array<{
+        title: string;
+        company: string;
+        location: string;
+        duration: string;
+        responsibilities: string[];
+        technologies: string[];
+    }>;
+    projects: Array<{
+        name: string;
+        duration: string;
+        responsibilities: string[];
+        technologies: string[];
+    }>;
+    technical_skills: string[];
+    certifications_achievements: string[];
 }
 
 export interface ChatTable {

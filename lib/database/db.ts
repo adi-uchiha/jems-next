@@ -29,5 +29,20 @@ export const db = new Kysely<Database>({
   dialect,
 });
 
+// Add helper functions for JSON handling
+export function stringifyForDB(data: unknown): string {
+  return JSON.stringify(data);
+}
+
+export function parseFromDB<T>(data: string | null, fallback: T): T {
+  if (!data) return fallback;
+  try {
+    return JSON.parse(data) as T;
+  } catch (e) {
+    console.warn('Failed to parse database JSON:', e);
+    return fallback;
+  }
+}
+
 
 

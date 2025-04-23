@@ -23,7 +23,7 @@ const pinecone = new Pinecone({
 
 const INDEX_NAME = process.env.PINECONE_INDEX || "job-embeddings";
 
-export async function getPineconeContext(query: string, topK: number = 15, minScore: number = 0.3): Promise<string> {
+export async function getPineconeContext(query: string, topK: number = 50, minScore: number = 0.0000001): Promise<string> {
   try {
     const embedding = await getEmbedding(query);
     const index = pinecone.Index(INDEX_NAME);
@@ -33,7 +33,7 @@ export async function getPineconeContext(query: string, topK: number = 15, minSc
       topK,
       includeMetadata: true,
     });
-
+    console.log("Query result:", queryResult);
     const rawMatches = queryResult.matches || [];
     if (rawMatches.length === 0) {
       return "No job matches found in Pinecone.";

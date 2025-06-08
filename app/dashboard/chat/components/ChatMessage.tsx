@@ -88,7 +88,6 @@ function parseJobRecommendations(content: string): { text: string; jobs: Job[] }
   }
 }
 
-
 export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
   const { text, jobs } = message.role === 'assistant'
     ? parseJobRecommendations(message.content)
@@ -97,7 +96,7 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
   return (
     <motion.div
       className={cn(
-        "flex gap-4 px-4 py-3 w-full",
+        "flex gap-4 px-4 py-3",
         message.role === 'user' ? 'justify-end' : 'justify-start'
       )}
       initial={isNew ? { y: 5, opacity: 0 } : false}
@@ -111,22 +110,22 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
         </div>
       )}
 
-      {/* Message Container - Updated with better width control */}
+      {/* Message Container */}
       <div className={cn(
-        "flex-1 flex",
+        "flex",
         message.role === 'user' ? 'justify-end' : 'justify-start',
-        "max-w-3xl" // Limit maximum width
+        "w-full max-w-3xl"
       )}>
         {/* Message Content */}
         <div className={cn(
           "rounded-lg p-4",
-          "min-w-0 max-w-[85%]", // Important for text wrapping
+          "w-fit max-w-[90%]",
           message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
         )}>
           {/* Text Content with improved wrapping */}
           {text && (
             <div className="break-words">
-              <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="max-w-none">
                 <Markdown components={{
                   p: ({ children }) => (
                     <p className="whitespace-pre-wrap break-words text-inherit m-0">
@@ -152,7 +151,17 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                     <li className="break-words">
                       {children}
                     </li>
-                  )
+                  ),
+                  code: ({ children }) => (
+                    <code className="break-words whitespace-pre-wrap text-sm bg-secondary/50 rounded px-1.5 py-0.5">
+                      {children}
+                    </code>
+                  ),
+                  pre: ({ children }) => (
+                    <pre className="whitespace-pre-wrap break-words bg-secondary/50 rounded-lg p-4 my-2 text-sm">
+                      {children}
+                    </pre>
+                  ),
                 }}>
                   {text}
                 </Markdown>
@@ -193,7 +202,7 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
                       {/* Title and Source Icon */}
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-semibold text-card-foreground/90 group-hover:text-primary 
-                          transition-colors duration-300 line-clamp-2">
+                          transition-colors duration-300 line-clamp-2 break-words">
                           {job.title}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -266,3 +275,4 @@ export function ChatMessage({ message, isNew = false }: ChatMessageProps) {
     </motion.div>
   );
 }
+

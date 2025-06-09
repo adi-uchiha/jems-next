@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, ZAxis } from "recharts";
 import { Activity, Briefcase, FileSpreadsheet, MessageSquare, SearchCheck, User, Settings, ChevronLeft, ChevronRight, BellIcon, LogOut, CalendarDays, TrendingUp, MapPin, Clock, Award, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -112,245 +112,257 @@ const barChartConfig = {
 };
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    totalEmbeddings: 0,
+    failedJobs: 0,
+    activeSessions: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/dashboard/stats');
+        if (!response.ok) throw new Error('Failed to fetch stats');
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div className="p-6">
-      {/* Dashboard content */}
-
+      {/* Quick actions */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+          <SearchCheck className="mr-2 h-4 w-4" />
+          Start New Scraping Session
+        </Button>
+        <Button 
+          variant="outline" 
+          className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+        >
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Update Preferences
+        </Button>
+        <Button 
+          variant="outline" 
+          className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+        >
+          <CalendarDays className="mr-2 h-4 w-4" />
+          View Calendar
+        </Button>
+        <Button 
+          variant="outline" 
+          className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
+        >
+          <TrendingUp className="mr-2 h-4 w-4" />
+          Job Market Trends
+        </Button>
+      </div>
       
-      {/* Dashboard content */}
-      <div className="p-6">
-        {/* Quick actions */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
-            <SearchCheck className="mr-2 h-4 w-4" />
-            Start New Scraping Session
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Update Preferences
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            <CalendarDays className="mr-2 h-4 w-4" />
-            View Calendar
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-border/50 text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            <TrendingUp className="mr-2 h-4 w-4" />
-            Job Market Trends
-          </Button>
-        </div>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <DashboardKpi
+          title="Total Jobs Scraped"
+          value={stats.totalJobs.toString()}
+          icon={SearchCheck}
+          className="bg-card/30 backdrop-blur-sm border-border/30"
+        />
+        <DashboardKpi
+          title="Total Embeddings"
+          value={stats.totalEmbeddings.toString()}
+          icon={FileSpreadsheet}
+          className="bg-card/30 backdrop-blur-sm border-border/30"
+        />
+        <DashboardKpi
+          title="Failed Jobs"
+          value={stats.failedJobs.toString()}
+          icon={Briefcase}
+          className="bg-card/30 backdrop-blur-sm border-border/30"
+        />
+        <DashboardKpi
+          title="Success Rate"
+          value={`${stats.totalJobs > 0 ? ((stats.totalJobs - stats.failedJobs) / stats.totalJobs * 100).toFixed(1) : 0}%`}
+          icon={Activity}
+          className="bg-card/30 backdrop-blur-sm border-border/30"
+        />
+        <DashboardKpi
+          title="Active Sessions"
+          value={stats.activeSessions.toString()}
+          icon={SearchCheck}
+          description="Currently running"
+          className="bg-card/30 backdrop-blur-sm border-border/30"
+        />
+      </div>
+
+      {/* Charts & Tables */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <ScrapingSessionTable />
         
-        {/* KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <DashboardKpi
-            title="Total Jobs Scraped"
-            value="1,024"
-            trend={5}
-            icon={SearchCheck}
-            className="bg-card/30 backdrop-blur-sm border-border/30"
-          />
-          <DashboardKpi
-            title="Unique Jobs"
-            value="887"
-            trend={2}
-            icon={FileSpreadsheet}
-            className="bg-card/30 backdrop-blur-sm border-border/30"
-          />
-          <DashboardKpi
-            title="Matching Jobs"
-            value="416"
-            trend={-3}
-            icon={Briefcase}
-            className="bg-card/30 backdrop-blur-sm border-border/30"
-          />
-          <DashboardKpi
-            title="Applications"
-            value="19"
-            trend={15}
-            icon={Activity}
-            className="bg-card/30 backdrop-blur-sm border-border/30"
-          />
-          <DashboardKpi
-            title="Active Sessions"
-            value="2"
-            icon={SearchCheck}
-            description="Currently running"
-            className="bg-card/30 backdrop-blur-sm border-border/30"
-          />
-        </div>
+        <DashboardChart title="Jobs Scraped Daily" config={lineChartConfig}>
+          <AreaChart data={jobsScrapedData}>
+            <defs>
+              <linearGradient id="colorJobs" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22C55E" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#22C55E" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="name" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Area type="monotone" dataKey="jobs" stroke="#22C55E" fillOpacity={1} fill="url(#colorJobs)" />
+          </AreaChart>
+        </DashboardChart>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <DashboardChart 
+          title="Jobs by Source" 
+          config={pieChartConfig}
+          className="rounded-lg border border-border/50 dark:border-border/20 bg-card"
+        >
+          <PieChart>
+            <Pie
+              data={jobSourcesData}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              dataKey="value"
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            >
+              {jobSourcesData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+          </PieChart>
+        </DashboardChart>
         
-        {/* Charts & Tables */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <ScrapingSessionTable />
-          
-          <DashboardChart title="Jobs Scraped Daily" config={lineChartConfig}>
-            <AreaChart data={jobsScrapedData}>
-              <defs>
-                <linearGradient id="colorJobs" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22C55E" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#22C55E" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="name" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Area type="monotone" dataKey="jobs" stroke="#22C55E" fillOpacity={1} fill="url(#colorJobs)" />
-            </AreaChart>
-          </DashboardChart>
-        </div>
+        <DashboardChart title="Application Progress" config={barChartConfig}>
+          <BarChart data={applicationStatusData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="name" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Bar dataKey="value">
+              {applicationStatusData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Bar>
+          </BarChart>
+        </DashboardChart>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DashboardChart 
-            title="Jobs by Source" 
-            config={pieChartConfig}
-            className="rounded-lg border border-border/50 dark:border-border/20 bg-card"
-          >
-            <PieChart>
-              <Pie
-                data={jobSourcesData}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {jobSourcesData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-            </PieChart>
-          </DashboardChart>
-          
-          <DashboardChart title="Application Progress" config={barChartConfig}>
-            <BarChart data={applicationStatusData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="name" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Bar dataKey="value">
-                {applicationStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </DashboardChart>
-          
-          <DashboardChart title="Chat Interactions" config={lineChartConfig}>
-            <LineChart data={chatInteractionsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="name" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Line type="monotone" dataKey="interactions" stroke="#22C55E" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            </LineChart>
-          </DashboardChart>
-        </div>
+        <DashboardChart title="Chat Interactions" config={lineChartConfig}>
+          <LineChart data={chatInteractionsData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="name" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Line type="monotone" dataKey="interactions" stroke="#22C55E" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+          </LineChart>
+        </DashboardChart>
+      </div>
+      
+      {/* Additional Charts Row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <DashboardChart title="Most Common Job Titles" config={barChartConfig}>
+          <BarChart layout="vertical" data={topJobTitlesData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis type="number" stroke="#888" />
+            <YAxis dataKey="name" type="category" width={150} stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Bar dataKey="value" fill="#22C55E" />
+          </BarChart>
+        </DashboardChart>
         
-        {/* Additional Charts Row 1 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <DashboardChart title="Most Common Job Titles" config={barChartConfig}>
-            <BarChart layout="vertical" data={topJobTitlesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis type="number" stroke="#888" />
-              <YAxis dataKey="name" type="category" width={150} stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Bar dataKey="value" fill="#22C55E" />
-            </BarChart>
-          </DashboardChart>
-          
-          <DashboardChart title="Your Skills vs. Market Demand" config={barChartConfig}>
-            <RadarChart outerRadius={90} width={500} height={250} data={skillMatchData}>
-              <PolarGrid stroke="#444" />
-              <PolarAngleAxis dataKey="skill" stroke="#888" />
-              <PolarRadiusAxis stroke="#888" />
-              <Radar name="Your Skills" dataKey="user" stroke="#22C55E" fill="#22C55E" fillOpacity={0.5} />
-              <Radar name="Market Average" dataKey="average" stroke="#94A3B8" fill="#94A3B8" fillOpacity={0.3} />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-            </RadarChart>
-          </DashboardChart>
-        </div>
+        <DashboardChart title="Your Skills vs. Market Demand" config={barChartConfig}>
+          <RadarChart outerRadius={90} width={500} height={250} data={skillMatchData}>
+            <PolarGrid stroke="#444" />
+            <PolarAngleAxis dataKey="skill" stroke="#888" />
+            <PolarRadiusAxis stroke="#888" />
+            <Radar name="Your Skills" dataKey="user" stroke="#22C55E" fill="#22C55E" fillOpacity={0.5} />
+            <Radar name="Market Average" dataKey="average" stroke="#94A3B8" fill="#94A3B8" fillOpacity={0.3} />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+          </RadarChart>
+        </DashboardChart>
+      </div>
+      
+      {/* Additional Charts Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <DashboardChart title="Jobs by Location" config={pieChartConfig}>
+          <PieChart>
+            <Pie
+              data={jobsByLocationData}
+              cx="50%"
+              cy="50%"
+              innerRadius={40}
+              outerRadius={80}
+              dataKey="value"
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            >
+              {jobsByLocationData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+          </PieChart>
+        </DashboardChart>
         
-        {/* Additional Charts Row 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <DashboardChart title="Jobs by Location" config={pieChartConfig}>
-            <PieChart>
-              <Pie
-                data={jobsByLocationData}
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={80}
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {jobsByLocationData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-            </PieChart>
-          </DashboardChart>
-          
-          <DashboardChart title="Salary Distribution" config={barChartConfig}>
-            <BarChart data={salaryRangeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="range" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Bar dataKey="count" fill="#9C27B0" />
-            </BarChart>
-          </DashboardChart>
-          
-          <DashboardChart title="Application Timeline" config={lineChartConfig}>
-            <LineChart data={applicationTimelineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="month" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
-              <Line type="monotone" dataKey="applications" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="interviews" stroke="#EC4899" strokeWidth={2} dot={{ r: 3 }} />
-            </LineChart>
-          </DashboardChart>
-        </div>
+        <DashboardChart title="Salary Distribution" config={barChartConfig}>
+          <BarChart data={salaryRangeData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="range" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Bar dataKey="count" fill="#9C27B0" />
+          </BarChart>
+        </DashboardChart>
         
-        {/* Resume Match Gauge */}
-        <div className="mt-6">
-          <DashboardChart title="Resume Match Percentage" config={lineChartConfig}>
-            <ResponsiveContainer width="100%" height="100%">
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="text-5xl font-bold mb-2 text-primary">68%</div>
-                  <div className="flex justify-center mb-4">
-                    <div className="w-64 h-4 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500" style={{width: '68%'}}></div>
-                    </div>
+        <DashboardChart title="Application Timeline" config={lineChartConfig}>
+          <LineChart data={applicationTimelineData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="month" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', borderColor: '#333' }} />
+            <Line type="monotone" dataKey="applications" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="interviews" stroke="#EC4899" strokeWidth={2} dot={{ r: 3 }} />
+          </LineChart>
+        </DashboardChart>
+      </div>
+      
+      {/* Resume Match Gauge */}
+      <div className="mt-6">
+        <DashboardChart title="Resume Match Percentage" config={lineChartConfig}>
+          <ResponsiveContainer width="100%" height="100%">
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="text-5xl font-bold mb-2 text-primary">68%</div>
+                <div className="flex justify-center mb-4">
+                  <div className="w-64 h-4 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500" style={{width: '68%'}}></div>
                   </div>
-                  <p className="text-sm text-muted-foreground">Average match percentage</p>
-                  <div className="flex gap-8 mt-2 justify-center">
-                    <div className="text-center">
-                      <div className="text-xl font-semibold text-red-500">45%</div>
-                      <p className="text-xs text-muted-foreground">Minimum</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-semibold text-green-500">92%</div>
-                      <p className="text-xs text-muted-foreground">Maximum</p>
-                    </div>
+                </div>
+                <p className="text-sm text-muted-foreground">Average match percentage</p>
+                <div className="flex gap-8 mt-2 justify-center">
+                  <div className="text-center">
+                    <div className="text-xl font-semibold text-red-500">45%</div>
+                    <p className="text-xs text-muted-foreground">Minimum</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-semibold text-green-500">92%</div>
+                    <p className="text-xs text-muted-foreground">Maximum</p>
                   </div>
                 </div>
               </div>
-            </ResponsiveContainer>
-          </DashboardChart>
-        </div>
+            </div>
+          </ResponsiveContainer>
+        </DashboardChart>
       </div>
     </div>
   );

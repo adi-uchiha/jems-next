@@ -83,12 +83,40 @@ export interface RawJobsTable {
     created_at: ColumnType<Date, string | Date, string | Date>;
 }
 
+export interface ScrapingSession {
+  id: number
+  total_jobs: number
+  total_embeddings: number
+  failed_jobs: number
+  started_at: Date
+  ended_at: Date | null
+  status: string
+  job_title: string
+}
+
+export interface UserTable {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: ColumnType<Date, string | undefined, never>;
+  updatedAt: ColumnType<Date, string | undefined, never>;
+  twoFactorEnabled: boolean | null;
+  role: string | null;
+  banned: boolean | null;
+  banReason: string | null;
+  banExpires: ColumnType<Date, string | undefined, never> | null;
+}
+
 // Combine all tables interface
 export interface Database {
+    user: UserTable;
     resumes: ResumeTable;
     chats: ChatTable;
     chat_messages: ChatMessageTable;
     raw_jobs: RawJobsTable;
+    scraping_sessions: ScrapingSession
 }
 
 // For GET operations - includes all fields
@@ -114,3 +142,8 @@ export type ChatMessageUpdate = Updateable<ChatMessageTable>;
 export type RawJob = Selectable<RawJobsTable>;
 export type NewRawJob = Insertable<RawJobsTable>;
 export type RawJobUpdate = Updateable<RawJobsTable>;
+
+// User types
+export type User = Selectable<UserTable>;
+export type NewUser = Insertable<UserTable>;
+export type UserUpdate = Updateable<UserTable>;

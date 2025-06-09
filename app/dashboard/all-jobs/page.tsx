@@ -3,56 +3,151 @@ import { useState, useEffect } from "react";
 import { Filter, MapPin, LayoutGrid, LayoutList, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/Badge";
 import { JobCard } from "@/components/JobCard";
 import { Checkbox } from "@/components/ui/checkbox";
-// import Navbar from "@/components/Navbar";
-import { jobs } from "@/data/jobs";
 import { cn } from "@/lib/utils";
+import { BaseJob, JobFilters } from "./types";
+import { mapJobToDisplayProps } from "./utils";
 
 const AllJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [salaryRange, setSalaryRange] = useState([0, 200]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [animatedJobs, setAnimatedJobs] = useState<string[]>([]);
-  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
-  const [selectedExperience, setSelectedExperience] = useState<string[]>([]);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [jobs, setJobs] = useState<BaseJob[]>([]);
+  const [animatedJobs, setAnimatedJobs] = useState<number[]>([]);
+  const [filters, setFilters] = useState<JobFilters>({
+    jobTypes: [],
+    experience: [],
+    salaryRange: [0, 200]
+  });
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const jobTypes = ["Full-time", "Part-time", "Contract", "Remote"];
   const experienceLevels = ["Entry Level", "Mid Level", "Senior Level"];
 
   // Simulate jobs loading with animation
   useEffect(() => {
-    const jobIds = jobs.map(job => job.id);
-    
+    const jobIds = jobs.map(job => Number(job.id));
     const timer = setTimeout(() => {
       setAnimatedJobs(jobIds);
     }, 100);
-    
     return () => clearTimeout(timer);
-  }, []);
+  }, [jobs]);
 
   // Filter jobs based on search term
   const filteredJobs = jobs.filter(job => 
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    (job.location?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (job.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
-  const resetFilters = () => {
-    setSelectedJobTypes([]);
-    setSelectedExperience([]);
-    setSalaryRange([0, 200]);
-    setActiveFilters([]);
+  const handleFilterChange = (type: keyof JobFilters, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: value
+    }));
   };
 
-  const removeFilter = (filter: string) => {
-    setActiveFilters(activeFilters.filter(f => f !== filter));
+  const handleJobTypeChange = (type: string, checked: boolean | string) => {
+    if (checked) {
+      handleFilterChange('jobTypes', [...filters.jobTypes, type]);
+    } else {
+      handleFilterChange('jobTypes', filters.jobTypes.filter(t => t !== type));
+    }
+  };
+
+  const handleExperienceChange = (level: string, checked: boolean | string) => {
+    if (checked) {
+      handleFilterChange('experience', [...filters.experience, level]);
+    } else {
+      handleFilterChange('experience', filters.experience.filter(e => e !== level));
+    }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      jobTypes: [],
+      experience: [],
+      salaryRange: [0, 200]
+    });
+  };
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const searchParams = new URLSearchParams({
+          search: searchTerm,
+          page: currentPage.toString(),
+          limit: '10',
+          jobTypes: filters.jobTypes.join(','),
+          salaryMin: filters.salaryRange[0].toString(),
+          salaryMax: filters.salaryRange[1].toString()
+        });
+
+        const response = await fetch(`/api/dashboard/jobs?${searchParams}`);
+        if (!response.ok) throw new Error('Failed to fetch jobs');
+        
+        const data = await response.json();
+        setJobs(data.jobs);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        setJobs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [searchTerm, currentPage, filters]);
+
+  // Update the jobs grid section to handle loading state
+  const renderJobsContent = () => {
+    if (loading) {
+      return (
+        <div className="space-y-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-32 bg-card/50 animate-pulse rounded-lg" />
+          ))}
+        </div>
+      );
+    }
+
+    if (!filteredJobs.length) {
+      return (
+        <div className="glass-panel py-16 text-center">
+          <p className="text-muted-foreground">No jobs found matching your criteria.</p>
+          <Button 
+            variant="link" 
+            className="mt-2 text-primary hover:text-primary/80"
+            onClick={resetFilters}
+          >
+            Clear filters
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+        {filteredJobs.map((job) => (
+          <JobCard 
+            key={job.id} 
+            job={mapJobToDisplayProps(job)}
+            className={cn(
+              animatedJobs.includes(Number(job.id)) ? "animate-scale-in" : "opacity-0",
+              "card-hover-effect"
+            )}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -108,10 +203,8 @@ const AllJobsPage = () => {
                 {jobTypes.map((type) => (
                   <label key={type} className="filter-label">
                     <Checkbox
-                      checked={selectedJobTypes.includes(type)}
-                      onCheckedChange={(checked) => {
-                        // ...existing checkbox logic
-                      }}
+                      checked={filters.jobTypes.includes(type)}
+                      onCheckedChange={(checked) => handleJobTypeChange(type, checked)}
                       className="mr-2"
                     />
                     {type}
@@ -128,13 +221,13 @@ const AllJobsPage = () => {
                     min={0}
                     max={200}
                     step={5}
-                    value={salaryRange}
-                    onValueChange={setSalaryRange}
+                    value={filters.salaryRange}
+                    onValueChange={(value) => handleFilterChange('salaryRange', value)}
                     className="[&>.relative]:bg-primary/20 dark:[&>.relative]:bg-primary/30"
                   />
                   <div className="flex justify-between mt-2">
-                    <span className="filter-range-value">${salaryRange[0]}k</span>
-                    <span className="filter-range-value">${salaryRange[1]}k</span>
+                    <span className="filter-range-value">${filters.salaryRange[0]}k</span>
+                    <span className="filter-range-value">${filters.salaryRange[1]}k</span>
                   </div>
                 </div>
               </div>
@@ -146,10 +239,8 @@ const AllJobsPage = () => {
                 {experienceLevels.map((level) => (
                   <label key={level} className="filter-label">
                     <Checkbox
-                      checked={selectedExperience.includes(level)}
-                      onCheckedChange={(checked) => {
-                        // ...existing checkbox logic
-                      }}
+                      checked={filters.experience.includes(level)}
+                      onCheckedChange={(checked) => handleExperienceChange(level, checked)}
                       className="mr-2"
                     />
                     {level}
@@ -172,21 +263,40 @@ const AllJobsPage = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mt-2">
-                {activeFilters.map((filter) => (
+                {filters.jobTypes.map((filter) => (
                   <span key={filter} className="filter-badge">
                     {filter}
                     <X 
                       className="ml-1 h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" 
-                      onClick={() => removeFilter(filter)}
+                      onClick={() => handleJobTypeChange(filter, false)}
                     />
                   </span>
                 ))}
+                {filters.experience.map((filter) => (
+                  <span key={filter} className="filter-badge">
+                    {filter}
+                    <X 
+                      className="ml-1 h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" 
+                      onClick={() => handleExperienceChange(filter, false)}
+                    />
+                  </span>
+                ))}
+                {filters.salaryRange[0] !== 0 || filters.salaryRange[1] !== 200 ? (
+                  <span className="filter-badge">
+                    Salary: ${filters.salaryRange[0]}k - ${filters.salaryRange[1]}k
+                    <X 
+                      className="ml-1 h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" 
+                      onClick={() => handleFilterChange('salaryRange', [0, 200])}
+                    />
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
 
           {/* Job listings */}
           <div className="flex-1">
+            {/* Stats and controls */}
             <div className="glass-panel p-5 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
@@ -237,54 +347,45 @@ const AllJobsPage = () => {
               </div>
             </div>
 
-            {filteredJobs.length > 0 ? (
-              <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
-                {filteredJobs.map((job) => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    className={cn(
-                      animatedJobs.includes(job.id) ? "animate-scale-in" : "opacity-0",
-                      "card-hover-effect"
-                    )}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="glass-panel py-16 text-center">
-                <p className="text-muted-foreground">No jobs found matching your criteria.</p>
-                <Button 
-                  variant="link" 
-                  className="mt-2 text-primary hover:text-primary/80"
-                  onClick={() => setSearchTerm('')}
-                >
-                  Clear filters
-                </Button>
-              </div>
-            )}
+            {/* Jobs grid with loading state */}
+            {renderJobsContent()}
 
-            {/* Pagination placeholder */}
-            {filteredJobs.length > 0 && (
+            {/* Pagination - only show when we have jobs and not loading */}
+            {!loading && filteredJobs.length > 0 && (
               <div className="flex justify-center mt-8">
                 <nav className="flex items-center space-x-1">
-                  <Button variant="outline" size="icon" disabled className="w-8 h-8">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                    className="w-8 h-8"
+                  >
                     <span className="sr-only">Previous</span>
                     <span aria-hidden="true">&lt;</span>
                   </Button>
-                  <Button variant="outline" size="icon" className="w-8 h-8 bg-blue-50 text-blue-600 border-blue-200">
-                    1
-                  </Button>
-                  <Button variant="outline" size="icon" className="w-8 h-8">
-                    2
-                  </Button>
-                  <Button variant="outline" size="icon" className="w-8 h-8">
-                    3
-                  </Button>
-                  <span className="px-2 text-gray-500">...</span>
-                  <Button variant="outline" size="icon" className="w-8 h-8">
-                    8
-                  </Button>
-                  <Button variant="outline" size="icon" className="w-8 h-8">
+                  {/* Page numbers */}
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      key={i}
+                      variant="outline"
+                      size="icon"
+                      className={cn(
+                        "w-8 h-8",
+                        currentPage === i + 1 && "bg-blue-50 text-blue-600 border-blue-200"
+                      )}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    className="w-8 h-8"
+                  >
                     <span className="sr-only">Next</span>
                     <span aria-hidden="true">&gt;</span>
                   </Button>

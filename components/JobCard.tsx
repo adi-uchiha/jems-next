@@ -1,22 +1,22 @@
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, ExternalLink, BookmarkPlus, ThumbsUp, ThumbsDown, MapPin, Briefcase, DollarSign } from "lucide-react";
+import { Heart, ExternalLink, BookmarkPlus, ThumbsUp, ThumbsDown, MapPin, Briefcase, DollarSign, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Tag } from "@/components/Tag";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { JobDisplayProps } from "@/app/dashboard/all-jobs/types";
 
-interface JobCardProps {
+export interface JobCardProps {
   job: {
     id: string;
     title: string;
     company: string;
-    logo: string;
     location: string;
-    salary: string;
     jobType: string;
+    salary: string;
     postedDate: string;
     description: string;
     platform: string;
@@ -28,7 +28,7 @@ interface JobCardProps {
   className?: string;
 }
 
-export const JobCard = ({ job, className }: JobCardProps) => {
+export function JobCard({ job, className }: JobCardProps) {
   return (
     <Link href={`/dashboard/all-jobs/job-details/${job.id}`} className="block">
       <div className={cn(
@@ -41,12 +41,8 @@ export const JobCard = ({ job, className }: JobCardProps) => {
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted/50 dark:bg-muted/30">
-                <img
-                  src={job.logo}
-                  alt={`${job.company} logo`}
-                  className="w-full h-full object-contain p-1"
-                />
+              <div className="relative flex-shrink-0 w-12 h-12 rounded-lg bg-muted/30 flex items-center justify-center">
+                <Building className="w-8 h-8 text-muted-foreground" />
               </div>
               <div>
                 <h3 className="font-medium text-foreground">{job.title}</h3>

@@ -3,42 +3,40 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Building, Calendar, Briefcase, AlertCircle } from "lucide-react";
+import { ChevronLeft, Calendar, Briefcase, AlertCircle, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { JobDetailHeader } from "@/components/JobDetailHeader";
 import { JobDetailContent } from "@/components/JobDetailContent";
 import { cn } from "@/lib/utils";
-import { jobs } from "@/data/jobs";
-import { Job } from "@/types/job"; // We'll create this type
+import { mapJobToDisplayProps, mapToSimilarJob } from "../../utils";
+import { BaseJob, SimilarJob } from "../../types";
+
+interface JobDetailsResponse {
+  job: BaseJob;
+  similarJobs: BaseJob[];
+}
 
 export default function JobDetail() {
   const params = useParams();
   const slug = params?.slug as string;
-  const [job, setJob] = useState<Job | null>(null);
+  const [job, setJob] = useState<BaseJob | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
+  const [similarJobs, setSimilarJobs] = useState<SimilarJob[]>([]);
 
   useEffect(() => {
-    const fetchJobDetails = () => {
+    const fetchJobDetails = async () => {
       setIsLoading(true);
       try {
-        // Find the job with matching id from jobs data
-        const foundJob = jobs.find(j => j.id === slug);
-        setJob(foundJob || null);
+        const response = await fetch(`/api/dashboard/jobs/${slug}`);
+        if (!response.ok) throw new Error('Failed to fetch job details');
+        const data: JobDetailsResponse = await response.json();
         
-        if (foundJob) {
-          // Find similar jobs based on tags
-          const similar = jobs
-            .filter(j => 
-              j.id !== slug && 
-              j.tags.some(tag => foundJob.tags.includes(tag))
-            )
-            .slice(0, 3);
-          setSimilarJobs(similar);
-        }
+        setJob(data.job);
+        setSimilarJobs(data.similarJobs.map(mapToSimilarJob));
       } catch (error) {
-        console.error("Error fetching job details:", error);
+        console.error('Error fetching job details:', error);
+        setJob(null);
       } finally {
         setIsLoading(false);
       }
@@ -49,7 +47,6 @@ export default function JobDetail() {
     }
   }, [slug]);
 
-  // Scroll to top when job changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
@@ -127,10 +124,9 @@ export default function JobDetail() {
           </Button>
 
           <div className="space-y-6">
-            <JobDetailHeader job={job} />
-            <JobDetailContent job={job} />
+            <JobDetailHeader job={mapJobToDisplayProps(job)} />
+            <JobDetailContent job={mapJobToDisplayProps(job)} />
             
-            {/* Similar jobs section */}
             {similarJobs.length > 0 && (
               <div className={cn(
                 "rounded-lg border border-border/50 mt-8",
@@ -157,16 +153,8 @@ export default function JobDetail() {
                           "hover:bg-accent/50 dark:hover:bg-accent/20",
                           "transition-colors duration-200"
                         )}>
-                          <div className={cn(
-                            "relative flex-shrink-0 w-10 h-10",
-                            "rounded-md overflow-hidden",
-                            "bg-muted/50 dark:bg-muted/30"
-                          )}>
-                            <img
-                              src={similarJob.logo}
-                              alt={`${similarJob.company} logo`}
-                              className="w-full h-full object-contain p-1"
-                            />
+                          <div className="relative flex-shrink-0 w-10 h-10 rounded-md bg-muted/30 flex items-center justify-center">
+                            <Building className="w-6 h-6 text-muted-foreground" />
                           </div>
                           <div className="flex-1">
                             <h3 className="font-medium text-foreground group-hover:text-accent-foreground">
@@ -177,7 +165,7 @@ export default function JobDetail() {
                               <span>{similarJob.company}</span>
                               <span className="mx-2">•</span>
                               <Briefcase className="h-3.5 w-3.5 mr-1" />
-                              <span>{similarJob.jobType}</span>
+                              <span>{similarJob.jobType || 'Full-time'}</span>
                               <span className="mx-2">•</span>
                               <Calendar className="h-3.5 w-3.5 mr-1" />
                               <span>{similarJob.postedDate}</span>

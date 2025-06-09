@@ -72,12 +72,16 @@ export const JobDetailHeader = ({ job }: JobDetailHeaderProps) => {
               "rounded-lg overflow-hidden",
               "bg-muted/50 dark:bg-muted/30"
             )}>
-              <img
-                src={job.logo}
-                alt={`${job.company} logo`}
-                className="w-full h-full object-contain p-2"
-                loading="lazy"
-              />
+              {job.logo === 'building-icon' ? (
+                <Building className="w-8 h-8 text-muted-foreground" />
+              ) : (
+                <img
+                  src={job.logo}
+                  alt={`${job.company} logo`}
+                  className="w-full h-full object-contain p-2"
+                  loading="lazy"
+                />
+              )}
             </div>
             
             <div>

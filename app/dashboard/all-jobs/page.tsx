@@ -113,7 +113,16 @@ const AllJobsPage = () => {
       return (
         <div className="space-y-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-32 bg-card/50 animate-pulse rounded-lg" />
+            <div key={i} className="glass-panel p-5 animate-pulse">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-lg bg-muted" />
+                <div className="flex-1 space-y-3">
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
+                  <div className="h-3 bg-muted rounded w-1/4" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       );
